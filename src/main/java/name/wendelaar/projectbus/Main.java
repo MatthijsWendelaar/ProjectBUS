@@ -1,4 +1,4 @@
-package name.wendelaar;
+package name.wendelaar.projectbus;
 
 public class Main {
 

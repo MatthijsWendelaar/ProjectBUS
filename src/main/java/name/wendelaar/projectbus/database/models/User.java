@@ -1,4 +1,4 @@
-package name.wendelaar.database.models;
+package name.wendelaar.projectbus.database.models;
 
 import name.wendelaar.matthijs.snowdb.annotations.Column;
 import name.wendelaar.matthijs.snowdb.annotations.Primary;
