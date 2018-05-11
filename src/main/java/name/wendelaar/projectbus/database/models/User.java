@@ -21,7 +21,7 @@ public class User extends Model {
     private String password;
 
     @Column(name = "rank")
-    private int rank;
+    private boolean rank;
 
     public int getId() {
         return id;
@@ -36,7 +36,7 @@ public class User extends Model {
     }
 
     public boolean isLiberian() {
-        return rank == 1;
+        return rank;
     }
 
     public boolean hasSamePassword(String password) {

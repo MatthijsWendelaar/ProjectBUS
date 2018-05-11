@@ -6,6 +6,6 @@ import name.wendelaar.projectbus.view.ViewState;
 public class Main {
 
     public static void main(String args[]) {
-        new MainManager(ViewState.LOGIN).initialize();
+        new MainManager(ViewState.LOGIN);
     }
 }

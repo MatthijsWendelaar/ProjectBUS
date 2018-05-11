@@ -1,14 +1,14 @@
 package name.wendelaar.projectbus.view;
 
-import javafx.application.Application;
-import javafx.stage.Stage;
+import name.wendelaar.matthijs.snowdb.SnowDB;
+import name.wendelaar.matthijs.snowdb.exceptions.SnowDBException;
 import name.wendelaar.projectbus.ProjectBusAPI;
 import name.wendelaar.projectbus.database.manager.HeadUserManager;
 import name.wendelaar.projectbus.database.manager.ItemManager;
 import name.wendelaar.projectbus.database.manager.ReservationManager;
 import name.wendelaar.projectbus.manager.*;
 
-public class MainManager extends Application implements IViewManager, IHeadController {
+public class MainManager implements IHeadController {
 
     //Manager related fields
     private HeadUserManager userManager;
@@ -17,38 +17,22 @@ public class MainManager extends Application implements IViewManager, IHeadContr
 
     //View related fields
     private ViewState state;
-
-    private boolean initialized = false;
+    private ViewManager viewManager;
 
     public MainManager(ViewState state) {
+        try {
+            SnowDB.initialize();
+        } catch (SnowDBException ex) {
+            ex.printStackTrace();
+        }
+
+        ProjectBusAPI.receiveController(this);
         this.state = state;
         this.userManager = new HeadUserManager(this);
         this.reservationManager = new ReservationManager(this);
         this.itemManager = new ItemManager(this);
-        ProjectBusAPI.receiveController(this);
-    }
+        this.viewManager = ViewManager.getInstance();
 
-    @Override
-    public void start(Stage primaryStage) throws Exception {
-
-    }
-
-    @Override
-    public void initialize() {
-        if (initialized) {
-            throw new IllegalStateException("The manager has already been initialized");
-        }
-        launch();
-        initialized = true;
-    }
-
-    @Override
-    public void changeState(ViewState state) {
-        if (state == null || state == this.state) {
-            return;
-        }
-        this.state = state;
-        //TODO: Change the view!
     }
 
     @Override
@@ -78,6 +62,8 @@ public class MainManager extends Application implements IViewManager, IHeadContr
 
     @Override
     public IViewManager getViewManager() {
-        return this;
+        return viewManager;
     }
+
+
 }
