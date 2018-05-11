@@ -36,7 +36,9 @@ public class ViewManager extends Application implements IViewManager {
         this.state = mainManager.getCurrentState();
         this.stage = primaryStage;
         loadScene(state);
-        stage.setResizable(false);
+        stage.setMinHeight(300);
+        stage.setMinWidth(300);
+        stage.setResizable(true);
         stage.show();
     }
 
