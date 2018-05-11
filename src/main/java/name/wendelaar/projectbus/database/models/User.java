@@ -38,4 +38,9 @@ public class User extends Model {
     public boolean isLiberian() {
         return rank == 1;
     }
+
+    public boolean hasSamePassword(String password) {
+        //TODO: add hashing!
+        return this.password.equals(password);
+    }
 }
