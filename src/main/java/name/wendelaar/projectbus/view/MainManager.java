@@ -2,7 +2,7 @@ package name.wendelaar.projectbus.view;
 
 import name.wendelaar.matthijs.snowdb.SnowDB;
 import name.wendelaar.matthijs.snowdb.exceptions.SnowDBException;
-import name.wendelaar.projectbus.ProjectBusAPI;
+import name.wendelaar.projectbus.LlsApi;
 import name.wendelaar.projectbus.database.manager.HeadUserManager;
 import name.wendelaar.projectbus.database.manager.ItemManager;
 import name.wendelaar.projectbus.database.manager.ReservationManager;
@@ -26,7 +26,7 @@ public class MainManager implements IHeadController {
             ex.printStackTrace();
         }
 
-        ProjectBusAPI.receiveController(this);
+        LlsApi.receiveController(this);
         this.state = state;
         this.userManager = new HeadUserManager(this);
         this.reservationManager = new ReservationManager(this);

@@ -1,0 +1,19 @@
+{
+	-fx-back-color: #16b9ff;
+}
+
+.primary-bg {
+	-fx-background-color: -fx-back-color;
+}
+
+.primary-input {
+	-fx-text-fill: #1976d2;
+}
+
+.primary-bg:hover {
+	-fx-background-color: #3dc5ff;
+}
+
+.root {
+	-fx-background-color: #1976d2;
+}

@@ -4,7 +4,7 @@ import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
-import name.wendelaar.projectbus.ProjectBusAPI;
+import name.wendelaar.projectbus.LlsApi;
 import name.wendelaar.projectbus.manager.IViewManager;
 import name.wendelaar.projectbus.view.controller.Controller;
 
@@ -32,14 +32,19 @@ public class ViewManager extends Application implements IViewManager {
     @Override
     public void start(Stage primaryStage) throws Exception {
         instance = this;
-        this.mainManager = (MainManager) ProjectBusAPI.getController();
+        this.mainManager = (MainManager) LlsApi.getController();
         this.state = mainManager.getCurrentState();
         this.stage = primaryStage;
         loadScene(state);
-        stage.setMinHeight(300);
-        stage.setMinWidth(300);
+        //stage.setMinHeight(300);
+        //stage.setMinWidth(300);
+        stage.setMaxHeight(450);
+        stage.setMaxWidth(650);
         stage.setResizable(true);
         stage.show();
+
+        System.out.println("real width: " + stage.getMinWidth());
+        System.out.println("real height: " + stage.getMinHeight());
     }
 
     @Override
@@ -51,19 +56,9 @@ public class ViewManager extends Application implements IViewManager {
         loadScene(this.state);
     }
 
-    private void loadScene(ViewState state) {
-        try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/views/" + state.getViewFile()));
-            loader.load();
-            currentScene = new Scene(loader.getRoot());
-            currentController = loader.getController();
-            currentController.receiveViewManager(this);
-
-            stage.setTitle("ProjectBUS - " + currentController.getTitle());
-            stage.setScene(currentScene);
-        } catch (IOException ex) {
-            ex.printStackTrace(); //TODO: error handling!
-        }
+    @Override
+    public Stage getStage() {
+        return stage;
     }
 
     public Controller getViewController() {
@@ -72,5 +67,20 @@ public class ViewManager extends Application implements IViewManager {
 
     public Scene getScene() {
         return currentScene;
+    }
+
+    private void loadScene(ViewState state) {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/views/" + state.getViewFile()));
+            loader.load();
+            currentScene = new Scene(loader.getRoot());
+            currentController = loader.getController();
+            currentController.receiveViewManager(this);
+
+            stage.setTitle("LLS - " + currentController.getTitle());
+            stage.setScene(currentScene);
+        } catch (IOException ex) {
+            ex.printStackTrace(); //TODO: error handling!
+        }
     }
 }

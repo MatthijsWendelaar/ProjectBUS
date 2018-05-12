@@ -13,6 +13,7 @@ import java.util.List;
 public class HeadUserManager implements IUserManager, IAuthenticationManager {
 
     private MainManager mainManager;
+    private User currentUser;
 
     public HeadUserManager(MainManager mainManager) {
         this.mainManager = mainManager;
@@ -67,7 +68,7 @@ public class HeadUserManager implements IUserManager, IAuthenticationManager {
     }
 
     @Override
-    public User authenticate(String email, String password) {
+    public boolean authenticate(String email, String password) {
         User user = null;
         //TODO:
         try {
@@ -75,10 +76,16 @@ public class HeadUserManager implements IUserManager, IAuthenticationManager {
         } catch (SQLException ex) {
             ex.printStackTrace(); //TODO: Good error handling!
         }
-        if (user == null) {
-            return null;
+        if (user == null || !user.hasSamePassword(password)) {
+            return false;
         }
+        currentUser = user;
 
-        return user.hasSamePassword(password) ? user : null;
+        return true;
+    }
+
+    @Override
+    public User getCurrentUser() {
+        return currentUser;
     }
 }

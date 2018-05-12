@@ -2,17 +2,17 @@ package name.wendelaar.projectbus;
 
 import name.wendelaar.projectbus.manager.*;
 
-public class ProjectBusAPI {
+public class LlsApi {
 
     private static IHeadController controller;
 
-    private ProjectBusAPI(){}
+    private LlsApi(){}
 
     public static void receiveController(IHeadController headController) {
-        if (ProjectBusAPI.controller != null) {
+        if (LlsApi.controller != null) {
             throw new IllegalStateException("The HeadController can only be set once!");
         }
-        ProjectBusAPI.controller = headController;
+        LlsApi.controller = headController;
     }
 
     public static IHeadController getController() {
