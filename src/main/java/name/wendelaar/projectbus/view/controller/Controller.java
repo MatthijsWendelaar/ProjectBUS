@@ -7,6 +7,8 @@ public abstract class Controller {
 
     protected int MIN_WIDTH_SIZE = 560;
     protected int MIN_HEIGHT_SIZE = 350;
+    protected int MAX_WIDTH_SIZE = 650;
+    protected int MAX_HEIGHT_SIZE = 450;
 
     protected IViewManager viewManager;
 
@@ -17,13 +19,10 @@ public abstract class Controller {
             throw new IllegalStateException("The controller already has a view manager assigned!");
         }
         this.viewManager = viewManager;
-
         Stage stage = viewManager.getStage();
-        System.out.println("WIDTH: " + MIN_WIDTH_SIZE);
-        System.out.println("HEIGHT: " + MIN_HEIGHT_SIZE);
         stage.setMinWidth(MIN_WIDTH_SIZE);
         stage.setMinHeight(MIN_HEIGHT_SIZE);
-        System.out.println("real width first: " + stage.getMinWidth());
-        System.out.println("real height first: " + stage.getMinHeight());
+        stage.setMaxWidth(MAX_WIDTH_SIZE);
+        stage.setMaxHeight(MAX_HEIGHT_SIZE);
     }
 }

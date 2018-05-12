@@ -36,15 +36,8 @@ public class ViewManager extends Application implements IViewManager {
         this.state = mainManager.getCurrentState();
         this.stage = primaryStage;
         loadScene(state);
-        //stage.setMinHeight(300);
-        //stage.setMinWidth(300);
-        stage.setMaxHeight(450);
-        stage.setMaxWidth(650);
         stage.setResizable(true);
         stage.show();
-
-        System.out.println("real width: " + stage.getMinWidth());
-        System.out.println("real height: " + stage.getMinHeight());
     }
 
     @Override
