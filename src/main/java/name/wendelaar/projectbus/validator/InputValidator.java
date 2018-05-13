@@ -1,25 +1,27 @@
 package name.wendelaar.projectbus.validator;
 
 import name.wendelaar.projectbus.view.parts.BusAlert;
+import name.wendelaar.simplevalidator.BoolValidator;
 
 public class InputValidator {
 
     public static void inputFilled(String message, String... inputs) throws ValidatorException {
-        for (String input : inputs) {
-            if (input == null || input.trim().equals("")) {
-                showAlert(message);
-                throw new ValidatorException();
-            }
+        if (!BoolValidator.notEmpty(inputs)) {
+            throwValidatorException(message);
         }
     }
 
     public static void isTrue(String message, boolean... inputs) throws ValidatorException {
-        for (boolean input : inputs) {
-            if (!input) {
-                showAlert(message);
-                throw new ValidatorException();
-            }
+        if (!BoolValidator.assertTrue(inputs)) {
+            throwValidatorException(message);
         }
+    }
+
+    private static void throwValidatorException(String message) throws ValidatorException {
+        if (BoolValidator.notNull(message)) {
+            showAlert(message);
+        }
+        throw new ValidatorException();
     }
 
     private static void showAlert(String message) {
