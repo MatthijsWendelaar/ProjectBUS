@@ -8,4 +8,6 @@ public interface IViewManager {
     public void changeState(ViewState state);
 
     public Stage getStage();
+
+    public IHeadController getHeadController();
 }

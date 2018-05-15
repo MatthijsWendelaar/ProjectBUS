@@ -8,6 +8,7 @@ import name.wendelaar.projectbus.LlsApi;
 import name.wendelaar.projectbus.database.models.User;
 import name.wendelaar.projectbus.validator.InputValidator;
 import name.wendelaar.projectbus.validator.ValidatorException;
+import name.wendelaar.projectbus.view.ViewState;
 import name.wendelaar.projectbus.view.parts.BusAlert;
 
 public class LoginController extends Controller {
@@ -35,10 +36,11 @@ public class LoginController extends Controller {
         try {
             InputValidator.inputFilled("All fields need to be filled", username, password);
 
-            boolean validAuth = LlsApi.getAuthenticationManager().authenticate(username, password);
+            boolean validAuth = LlsApi.getAuthManager().authenticate(username, password);
             InputValidator.isTrue("The credentials did not match", validAuth);
 
-            new BusAlert().addDefaultStyleSheet().setMessage("Lekker mwoan het is je gelukt! je naam is: " + LlsApi.getAuthenticationManager().getCurrentUser().getUsername()).showAndWait();
+            viewManager.changeState(ViewState.INDEX_DEFAULT);
+            //new BusAlert().addDefaultStyleSheet().setMessage("Lekker mwoan het is je gelukt! je naam is: " + LlsApi.getAuthenticationManager().getCurrentUser().getUsername()).showAndWait();
         } catch (ValidatorException ex) {}
     }
 }

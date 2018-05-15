@@ -1,7 +1,8 @@
 package name.wendelaar.projectbus.view;
 
 public enum ViewState {
-    LOGIN("login.fxml");
+    LOGIN("login.fxml"),
+    INDEX_DEFAULT("indexUser.fxml");
 
     private String fileName;
 

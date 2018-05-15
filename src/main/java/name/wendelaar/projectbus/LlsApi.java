@@ -27,7 +27,7 @@ public class LlsApi {
         return controller.getUserManager();
     }
 
-    public static IAuthenticationManager getAuthenticationManager() {
+    public static IAuthenticationManager getAuthManager() {
         return controller.getAuthManager();
     }
 

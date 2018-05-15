@@ -5,6 +5,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 import name.wendelaar.projectbus.LlsApi;
+import name.wendelaar.projectbus.manager.IHeadController;
 import name.wendelaar.projectbus.manager.IViewManager;
 import name.wendelaar.projectbus.view.controller.Controller;
 
@@ -52,6 +53,11 @@ public class ViewManager extends Application implements IViewManager {
     @Override
     public Stage getStage() {
         return stage;
+    }
+
+    @Override
+    public IHeadController getHeadController() {
+        return mainManager;
     }
 
     public Controller getViewController() {
