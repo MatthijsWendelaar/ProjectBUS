@@ -1,0 +1,13 @@
+.tab-pane .tab
+{
+	-fx-start-margin: 10px;
+	-fx-background-color: #16b9ff;
+}
+
+.tab-pane .tab:hover {
+	-fx-background-color: #3dc5ff;
+}
+
+.tab-pane .tab:selected {
+	-fx-background-color: #4a41f4;
+}

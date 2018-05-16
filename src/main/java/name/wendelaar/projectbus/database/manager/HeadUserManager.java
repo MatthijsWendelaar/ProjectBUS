@@ -1,6 +1,7 @@
 package name.wendelaar.projectbus.database.manager;
 
-import name.wendelaar.matthijs.snowdb.manager.Manager;
+import name.wendelaar.projectbus.database.models.UserData;
+import name.wendelaar.snowdb.manager.Manager;
 import name.wendelaar.projectbus.database.models.User;
 import name.wendelaar.projectbus.manager.IAuthenticationManager;
 import name.wendelaar.projectbus.manager.IUserManager;
@@ -43,6 +44,17 @@ public class HeadUserManager implements IUserManager, IAuthenticationManager {
             ex.printStackTrace(); //TODO: Good error handling!
         }
         return user;
+    }
+
+    @Override
+    public UserData getUserData(int id) {
+        UserData data = null;
+        try {
+            data = Manager.create().prepare("SELECT * FROM user_data_personal WHERE user_id = ? LIMIT 1", id).findOne(UserData.class);
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
+        return data;
     }
 
     @Override

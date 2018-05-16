@@ -1,7 +1,7 @@
 package name.wendelaar.projectbus.view;
 
-import name.wendelaar.matthijs.snowdb.SnowDB;
-import name.wendelaar.matthijs.snowdb.exceptions.SnowDBException;
+import name.wendelaar.snowdb.SnowDB;
+import name.wendelaar.snowdb.exceptions.SnowDBException;
 import name.wendelaar.projectbus.LlsApi;
 import name.wendelaar.projectbus.database.manager.HeadUserManager;
 import name.wendelaar.projectbus.database.manager.ItemManager;

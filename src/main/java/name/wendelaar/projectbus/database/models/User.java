@@ -1,9 +1,11 @@
 package name.wendelaar.projectbus.database.models;
 
-import name.wendelaar.matthijs.snowdb.annotations.Column;
-import name.wendelaar.matthijs.snowdb.annotations.Primary;
-import name.wendelaar.matthijs.snowdb.annotations.Table;
-import name.wendelaar.matthijs.snowdb.model.Model;
+import name.wendelaar.projectbus.LlsApi;
+import name.wendelaar.snowdb.annotations.Column;
+import name.wendelaar.snowdb.annotations.Foreign;
+import name.wendelaar.snowdb.annotations.Primary;
+import name.wendelaar.snowdb.annotations.Table;
+import name.wendelaar.snowdb.model.Model;
 
 @Table(name = "user")
 public class User extends Model {
@@ -11,24 +13,23 @@ public class User extends Model {
     @Primary(name = "id")
     private int id;
 
-    @Column(name = "username")
-    private String username;
-
     @Column(name = "email")
     private String email;
 
     @Column(name = "password")
     private String password;
 
-    @Column(name = "rank")
-    private boolean rank;
+    @Column(name = "role")
+    private boolean role;
+
+    @Foreign(name = "added_by", foreignModel = User.class)
+    private User addedBy;
+
+    private UserData userData;
+    private boolean requestedUserData = false;
 
     public int getId() {
         return id;
-    }
-
-    public String getUsername() {
-        return username;
     }
 
     public String getEmail() {
@@ -36,7 +37,15 @@ public class User extends Model {
     }
 
     public boolean isLiberian() {
-        return rank;
+        return role;
+    }
+
+    public UserData getUserData() {
+        if (userData == null && !requestedUserData) {
+            userData = LlsApi.getUserManager().getUserData(id);
+            requestedUserData = true;
+        }
+        return userData;
     }
 
     public boolean hasSamePassword(String password) {

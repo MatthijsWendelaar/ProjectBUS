@@ -1,11 +1,19 @@
 package name.wendelaar.projectbus.view.controller;
 
-import name.wendelaar.projectbus.LlsApi;
-import name.wendelaar.projectbus.view.parts.BusAlert;
+import javafx.event.Event;
+import javafx.fxml.FXML;
+import javafx.scene.control.Tab;
+import javafx.scene.control.TableView;
 
 public class IndexController extends Controller {
 
     private String title = "Home";
+
+    @FXML
+    private Tab loanedItemsTab;
+
+    @FXML
+    private TableView itemsTable;
 
     @Override
     public String getTitle() {
@@ -13,6 +21,21 @@ public class IndexController extends Controller {
     }
 
     public IndexController() {
-        new BusAlert().addDefaultStyleSheet().setMessage("Welcome " + LlsApi.getAuthManager().getCurrentUser().getUsername()).showAndWait();
+        //new BusAlert().addDefaultStyleSheet().setMessage("Welcome " + LlsApi.getAuthManager().getCurrentUser().getUsername()).showAndWait();
+    }
+
+    @FXML
+    public void getLoanedItems(Event event) {
+        if (loanedItemsTab.isSelected()) {
+            System.out.println("is het werkelijke zo?");
+            System.out.println(event.getSource());
+        }
+
+        System.out.println(event.getEventType());
+        //System.out.println(event.getSource());
+        //System.out.println(event.getTarget());
+//        if (event.getSource() == loanedItemsTab) {
+//            System.out.println("Ik trigger");
+//        }
     }
 }
