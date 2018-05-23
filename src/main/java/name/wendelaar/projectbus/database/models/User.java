@@ -1,55 +1,39 @@
 package name.wendelaar.projectbus.database.models;
 
-import name.wendelaar.projectbus.LlsApi;
-import name.wendelaar.snowdb.annotations.Column;
-import name.wendelaar.snowdb.annotations.Foreign;
-import name.wendelaar.snowdb.annotations.Primary;
-import name.wendelaar.snowdb.annotations.Table;
-import name.wendelaar.snowdb.model.Model;
+import name.wendelaar.snowdb.data.DataObject;
+import name.wendelaar.snowdb.data.model.Model;
 
-@Table(name = "user")
 public class User extends Model {
 
-    @Primary(name = "id")
-    private int id;
-
-    @Column(name = "email")
-    private String email;
-
-    @Column(name = "password")
-    private String password;
-
-    @Column(name = "role")
-    private boolean role;
-
-    @Foreign(name = "added_by", foreignModel = User.class)
-    private User addedBy;
-
-    private UserData userData;
-    private boolean requestedUserData = false;
+    public User(DataObject dataObject) {
+        super(dataObject, "user");
+    }
 
     public int getId() {
-        return id;
+        return (int) dataObject.get("id");
     }
 
     public String getEmail() {
-        return email;
+        return (String) dataObject.get("email");
     }
 
     public boolean isLiberian() {
-        return role;
-    }
-
-    public UserData getUserData() {
-        if (userData == null && !requestedUserData) {
-            userData = LlsApi.getUserManager().getUserData(id);
-            requestedUserData = true;
-        }
-        return userData;
+        return (boolean) dataObject.get("role");
     }
 
     public boolean hasSamePassword(String password) {
         //TODO: add hashing!
-        return this.password.equals(password);
+        Object object = dataObject.get("password");
+        if (object == null) {
+            return false;
+        }
+
+        return object.equals(password);
+    }
+
+    public void printAll() {
+        for (Object o : dataObject.getAll()) {
+            System.out.println(o);
+        }
     }
 }

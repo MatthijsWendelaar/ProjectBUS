@@ -21,7 +21,7 @@ public class MainManager implements IHeadController {
 
     public MainManager(ViewState state) {
         try {
-            SnowDB.initialize();
+            SnowDB.getInstance().initialize();
         } catch (SnowDBException ex) {
             ex.printStackTrace();
         }

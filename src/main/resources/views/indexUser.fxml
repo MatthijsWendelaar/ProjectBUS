@@ -18,13 +18,13 @@
       <content>
         <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                <children>
-                  <TableView fx:id="itemsTable" layoutX="14.0" layoutY="14.0" prefHeight="342.0" prefWidth="573.0">
+                  <TableView fx:id="itemsTable" layoutX="14.0" layoutY="118.0" prefHeight="234.0" prefWidth="564.0">
                     <columns>
-                      <TableColumn prefWidth="75.0" text="Name" />
-                      <TableColumn prefWidth="75.0" text="Type" />
-                        <TableColumn prefWidth="75.0" text="Loaned At" />
+                      <TableColumn fx:id="name" prefWidth="75.0" text="Name" />
+                      <TableColumn fx:id="age" prefWidth="75.0" text="Age" />
                     </columns>
                   </TableView>
+                  <ComboBox fx:id="combo" layoutX="14.0" layoutY="14.0" prefWidth="150.0" />
                </children></AnchorPane>
       </content>
     </Tab>

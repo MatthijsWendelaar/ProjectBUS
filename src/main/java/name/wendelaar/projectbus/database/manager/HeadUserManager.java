@@ -1,6 +1,7 @@
 package name.wendelaar.projectbus.database.manager;
 
 import name.wendelaar.projectbus.database.models.UserData;
+import name.wendelaar.snowdb.data.DataObject;
 import name.wendelaar.snowdb.manager.Manager;
 import name.wendelaar.projectbus.database.models.User;
 import name.wendelaar.projectbus.manager.IAuthenticationManager;
@@ -8,6 +9,7 @@ import name.wendelaar.projectbus.manager.IUserManager;
 import name.wendelaar.projectbus.view.MainManager;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -39,7 +41,7 @@ public class HeadUserManager implements IUserManager, IAuthenticationManager {
     public User getUser(int id) {
         User user = null;
         try {
-            user = Manager.create().prepare("SELECT * FROM user WHERE id = ? LIMIT 1", id).findOne(User.class);
+            user = new User(Manager.create().prepare("SELECT * FROM user WHERE id = ? LIMIT 1", id).findOne());
         } catch (SQLException ex) {
             ex.printStackTrace(); //TODO: Good error handling!
         }
@@ -50,7 +52,7 @@ public class HeadUserManager implements IUserManager, IAuthenticationManager {
     public UserData getUserData(int id) {
         UserData data = null;
         try {
-            data = Manager.create().prepare("SELECT * FROM user_data_personal WHERE user_id = ? LIMIT 1", id).findOne(UserData.class);
+            data = new UserData(Manager.create().prepare("SELECT * FROM user_data_personal WHERE user_id = ? LIMIT 1", id).findOne(), null);
         } catch (SQLException ex) {
             ex.printStackTrace();
         }
@@ -61,7 +63,7 @@ public class HeadUserManager implements IUserManager, IAuthenticationManager {
     public User getUser(String username) {
         User user = null;
         try {
-            user = Manager.create().prepare("SELECT * FROM user WHERE username = ? LIMIT 1", username).findOne(User.class);
+            user = new User(Manager.create().prepare("SELECT * FROM user WHERE username = ? LIMIT 1", username).findOne());
         } catch (SQLException ex) {
             ex.printStackTrace(); //TODO: Good error handling!
         }
@@ -70,13 +72,16 @@ public class HeadUserManager implements IUserManager, IAuthenticationManager {
 
     @Override
     public Collection<User> getUsers() {
-        List<User> user = null;
+        List<User> users = new ArrayList<>();
         try {
-            user = Manager.create().prepare("SELECT * FROM user").find(User.class);
+            List<DataObject> dataObjects = Manager.create().prepare("SELECT * FROM user").find();
+            for (DataObject dataObject : dataObjects) {
+                users.add(new User(dataObject));
+            }
         } catch (SQLException ex) {
             ex.printStackTrace(); //TODO: Good error handling!
         }
-        return user;
+        return users;
     }
 
     @Override
@@ -84,7 +89,7 @@ public class HeadUserManager implements IUserManager, IAuthenticationManager {
         User user = null;
         //TODO:
         try {
-            user = Manager.create().prepare("SELECT * FROM user WHERE email = ? LIMIT 1", email).findOne(User.class);
+            user = new User(Manager.create().prepare("SELECT * FROM user WHERE email = ? LIMIT 1", email).findOne());
         } catch (SQLException ex) {
             ex.printStackTrace(); //TODO: Good error handling!
         }
