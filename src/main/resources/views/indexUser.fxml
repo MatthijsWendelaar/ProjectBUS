@@ -11,7 +11,10 @@
   <tabs>
     <Tab text="Dashboard">
       <content>
-        <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" stylesheets="" />
+        <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" stylesheets="">
+               <children>
+                  <WebView layoutX="5.0" layoutY="4.0" prefHeight="352.0" prefWidth="563.0" />
+               </children></AnchorPane>
       </content>
     </Tab>
     <Tab fx:id="loanedItemsTab" onSelectionChanged="#getLoanedItems" text="Loaned Items">

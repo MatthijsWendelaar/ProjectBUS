@@ -18,7 +18,7 @@ public class User extends Model {
     }
 
     public boolean isLiberian() {
-        return (boolean) dataObject.get("role");
+        return (boolean) dataObject.get("rank");
     }
 
     public boolean hasSamePassword(String password) {
