@@ -2,20 +2,22 @@ package name.wendelaar.projectbus.view.controller;
 
 import javafx.event.Event;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.layout.AnchorPane;
 import name.wendelaar.projectbus.LlsApi;
-import name.wendelaar.projectbus.database.models.Book;
-import name.wendelaar.projectbus.database.models.ItemAttribute;
-import name.wendelaar.projectbus.database.models.User;
-import name.wendelaar.projectbus.database.models.UserData;
+import name.wendelaar.projectbus.database.models.*;
+import name.wendelaar.projectbus.view.parts.TableBuilder;
 import name.wendelaar.snowdb.data.DataObject;
 import name.wendelaar.snowdb.data.DataObjectCollection;
 import name.wendelaar.snowdb.manager.Manager;
 
+import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -26,22 +28,9 @@ public class IndexController extends Controller {
     private String title = "Home";
 
     @FXML
-    private Tab loanedItemsTab;
+    private AnchorPane showDataPane;
 
-    @FXML
-    private TableView<User> itemsTable;
-
-    @FXML
-    private TableColumn<User, String> name;
-
-    @FXML
-    private TableColumn<User, Integer> age;
-
-    @FXML
-    private ComboBox<String> combo;
-
-    protected static final String[] names = {"Jan", "Piet", "Klaas", "Nathan", "Ellen"};
-    protected static final int[] ages = {10, 21, 58, 20, 32};
+    private TableView itemView;
 
     @Override
     public String getTitle() {
@@ -49,13 +38,6 @@ public class IndexController extends Controller {
     }
 
     public IndexController() {
-        //new BusAlert().addDefaultStyleSheet().setMessage("Welcome " + LlsApi.getAuthManager().getCurrentUser().getUsername()).showAndWait();
-        //UserData data = LlsApi.getUserManager().getUserData(1);
-        //data.printAll();
-        System.out.println();
-        //User user = LlsApi.getUserManager().getUser(1);
-        //user.printAll();
-
         try {
             DataObject dataObject = Manager.create().prepare("SELECT * FROM item INNER JOIN item_type ON item.item_type_id = item_type.id WHERE item_type.id = ? LIMIT 1")
                     .setValue(1)
@@ -84,46 +66,25 @@ public class IndexController extends Controller {
     }
 
     @FXML
-    public void getLoanedItems(Event event) {
-        if (loanedItemsTab.isSelected()) {
-        }
+    private void onShowLoanedItems() {
+        try {
+            List<DataObject> dataObjects = Manager.create().prepare("SELECT * FROM item INNER JOIN item_type ON item.item_type_id = item_type.id WHERE item.user_id = ?")
+                    .setValue(LlsApi.getAuthManager().getCurrentUser().getId())
+                    .find();
 
-        //System.out.println(event.getEventType());
-        //System.out.println(event.getSource());
-        //System.out.println(event.getTarget());
-//        if (event.getSource() == loanedItemsTab) {
-//            System.out.println("Ik trigger");
-//        }
-    }
+            List<Item> items = new ArrayList<>();
 
-    @FXML
-    void initialize() {
-        combo.getItems().addAll("Laat ze allemaal zien", "Laat jonger dan 40 zien", "Laat 40 jaar en ouder zien");
-        combo.getSelectionModel().selectFirst();
+            for (DataObject dataObject : dataObjects) {
+                items.add(new Item((DataObjectCollection) dataObject, "all"));
+            }
 
-        name.setCellValueFactory(new PropertyValueFactory<User, String>("Email"));
-        age.setCellValueFactory(new PropertyValueFactory<User, Integer>("Id"));
+            TableBuilder<Item,String> builder = new TableBuilder<>();
+            itemView = builder.addColumn("Name", "Name")
+                    .addColumn("Type", "TypeName").addColumn("Date Loaned", "LoanedOutDate")
+                    .addColumn("To Late", "ToLateToString").getTableView();
+            itemView.getItems().addAll(items);
+            showDataPane.getChildren().add(itemView);
 
-        Collection<User> users = LlsApi.getUserManager().getUsers();
-
-        itemsTable.getItems().addAll(users);
-    }
-
-    public class PersonModel {
-        private String name;
-        private int age;
-
-        public PersonModel(String name, int age) {
-            this.name = name;
-            this.age = age;
-        }
-
-        public String getName() {
-            return name;
-        }
-
-        public int getAge() {
-            return age;
-        }
+        } catch (SQLException ex) {ex.printStackTrace();}
     }
 }

@@ -7,29 +7,13 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<TabPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" stylesheets="@../css/dashboard.css" tabClosingPolicy="UNAVAILABLE" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="name.wendelaar.projectbus.view.controller.IndexController">
-  <tabs>
-    <Tab text="Dashboard">
-      <content>
-        <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" stylesheets="">
-               <children>
-                  <WebView layoutX="5.0" layoutY="4.0" prefHeight="352.0" prefWidth="563.0" />
-               </children></AnchorPane>
-      </content>
-    </Tab>
-    <Tab fx:id="loanedItemsTab" onSelectionChanged="#getLoanedItems" text="Loaned Items">
-      <content>
-        <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
-               <children>
-                  <TableView fx:id="itemsTable" layoutX="14.0" layoutY="118.0" prefHeight="234.0" prefWidth="564.0">
-                    <columns>
-                      <TableColumn fx:id="name" prefWidth="75.0" text="Name" />
-                      <TableColumn fx:id="age" prefWidth="75.0" text="Age" />
-                    </columns>
-                  </TableView>
-                  <ComboBox fx:id="combo" layoutX="14.0" layoutY="14.0" prefWidth="150.0" />
-               </children></AnchorPane>
-      </content>
-    </Tab>
-  </tabs>
-</TabPane>
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="name.wendelaar.projectbus.view.controller.IndexController">
+   <children>
+      <Pane prefHeight="400.0" prefWidth="137.0" style="-fx-background-color: blue;">
+         <children>
+            <Button layoutY="53.0" mnemonicParsing="false" onAction="#onShowLoanedItems" prefHeight="25.0" prefWidth="137.0" text="Loaned Items" />
+         </children>
+      </Pane>
+      <AnchorPane fx:id="showDataPane" layoutX="137.0" prefHeight="400.0" prefWidth="463.0" />
+   </children>
+</AnchorPane>

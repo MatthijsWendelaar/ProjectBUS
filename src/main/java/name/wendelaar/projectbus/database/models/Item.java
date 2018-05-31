@@ -6,11 +6,13 @@ import name.wendelaar.snowdb.data.DataObject;
 import name.wendelaar.snowdb.data.DataObjectCollection;
 import name.wendelaar.snowdb.data.model.Model;
 
+import java.sql.Date;
+import java.sql.Timestamp;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-public abstract class Item extends Model {
+public class Item extends Model {
 
     @Data
     protected ItemType itemType;
@@ -26,7 +28,7 @@ public abstract class Item extends Model {
         ExcepValidator.notNull("Item type not found in collection", itemTypeData);
 
         itemType = new ItemType(itemTypeData);
-        if (!type.equalsIgnoreCase(itemType.getName())) {
+        if (!type.equalsIgnoreCase("all") && !type.equalsIgnoreCase(itemType.getName())) {
             throw new IllegalArgumentException("item types must match");
         }
     }
@@ -41,6 +43,22 @@ public abstract class Item extends Model {
 
     public int getLoanedOutCount() {
         return (int) dataObject.get("loaned_out_count");
+    }
+
+    public Timestamp getLoanedOutDate() {
+        return (Timestamp) dataObject.get("loaned_out_at");
+    }
+
+    public boolean isToLate() {
+        return (boolean) dataObject.get("to_late");
+    }
+
+    public String getToLateToString() {
+        return (boolean) dataObject.get("to_late") ? "Yes" : "No";
+    }
+
+    public String getTypeName() {
+        return itemType.getName();
     }
 
     public void setAttributes(Collection<ItemAttribute> attributes) {

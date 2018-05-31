@@ -87,9 +87,13 @@ public class HeadUserManager implements IUserManager, IAuthenticationManager {
     @Override
     public boolean authenticate(String email, String password) {
         User user = null;
-        //TODO:
         try {
-            user = new User(Manager.create().prepare("SELECT * FROM user WHERE email = ? LIMIT 1", email).findOne());
+            DataObject dataObject = Manager.create().prepare("SELECT * FROM user WHERE email = ? LIMIT 1", email).findOne();
+            if (dataObject == null) {
+                return false;
+            }
+
+            user = new User(dataObject);
         } catch (SQLException ex) {
             ex.printStackTrace(); //TODO: Good error handling!
         }
