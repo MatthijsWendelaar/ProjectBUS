@@ -36,4 +36,9 @@ public class BusAlert extends Alert {
         setContentText(message);
         return this;
     }
+
+    public BusAlert addButton(ButtonType type) {
+        getDialogPane().getButtonTypes().add(type);
+        return this;
+    }
 }

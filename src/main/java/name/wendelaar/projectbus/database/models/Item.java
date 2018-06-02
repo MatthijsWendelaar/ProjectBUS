@@ -6,7 +6,6 @@ import name.wendelaar.snowdb.data.DataObject;
 import name.wendelaar.snowdb.data.DataObjectCollection;
 import name.wendelaar.snowdb.data.model.Model;
 
-import java.sql.Date;
 import java.sql.Timestamp;
 import java.util.Collection;
 import java.util.HashMap;
@@ -22,7 +21,7 @@ public class Item extends Model {
     public Item(DataObjectCollection dataObject, String type) {
         super(dataObject, "item");
 
-        ExcepValidator.notNull("Type can not be null",type);
+        ExcepValidator.notNull("Type can not be null", type);
         DataObject itemTypeData = dataObject.getDataObjectByTable("item_type");
 
         ExcepValidator.notNull("Item type not found in collection", itemTypeData);
@@ -77,6 +76,15 @@ public class Item extends Model {
             }
             attributeMap.put(attribute.getAttributeName(), attribute);
         }
+    }
+
+    public void resetItem() {
+        dataObject.set("to_late", false);
+        dataObject.set("user_id", null);
+        dataObject.set("loaned_out_at", null);
+        dataObject.set("loaned_out", 0);
+        char c = 65;
+        System.out.println("WHta:? " + c);
     }
 
     protected Object getAttributeValue(String name) {

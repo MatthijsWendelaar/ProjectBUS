@@ -1,12 +1,20 @@
 package name.wendelaar.projectbus.database.manager;
 
+import name.wendelaar.projectbus.LlsApi;
 import name.wendelaar.projectbus.database.models.Item;
+import name.wendelaar.projectbus.database.models.ItemAttribute;
 import name.wendelaar.projectbus.database.models.ItemType;
 import name.wendelaar.projectbus.database.models.User;
 import name.wendelaar.projectbus.manager.IItemManager;
 import name.wendelaar.projectbus.view.MainManager;
+import name.wendelaar.snowdb.data.DataObject;
+import name.wendelaar.snowdb.data.DataObjectCollection;
+import name.wendelaar.snowdb.manager.Manager;
 
+import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 public class ItemManager implements IItemManager {
 
@@ -27,8 +35,58 @@ public class ItemManager implements IItemManager {
     }
 
     @Override
+    public void returnItem(Item item) {
+        item.resetItem();
+        Manager.saveModel(item);
+    }
+
+    @Override
     public void loanOutItem(User borrower, Item item) {
 
+    }
+
+    @Override
+    public Collection<Item> getItemsOfUser(User user) {
+        List<Item> items = new ArrayList<>();
+        if (user == null || user.getId() == 0) {
+            return items;
+        }
+
+        try {
+            List<DataObject> dataObjects = Manager.create().prepare("SELECT * FROM item INNER JOIN item_type ON item.item_type_id = item_type.id WHERE item.user_id = ?")
+                    .setValue(user.getId())
+                    .find();
+
+            for (DataObject dataObject : dataObjects) {
+                items.add(new Item((DataObjectCollection) dataObject, "all"));
+            }
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+            return items;
+        }
+        return items;
+    }
+
+    @Override
+    public Collection<ItemAttribute> getAttributesOfItem(Item item) {
+        List<ItemAttribute> itemAttributes = new ArrayList<>();
+        if (item == null || item.getId() == 0){
+            return itemAttributes;
+        }
+
+        try {
+            List<DataObject> dataObjects = Manager.create().prepare("SELECT * FROM item_attribute_values INNER JOIN item_type_attribute ON item_attribute_values.item_type_attribute_id = item_type_attribute.id INNER JOIN attribute ON item_type_attribute.attribute_id = attribute.id WHERE item_attribute_values.item_id = ?")
+                    .setValue(item.getId())
+                    .find();
+
+            for (DataObject dataObject : dataObjects) {
+                itemAttributes.add(new ItemAttribute((DataObjectCollection) dataObject));
+            }
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+            return itemAttributes;
+        }
+        return itemAttributes;
     }
 
     @Override
