@@ -35,9 +35,8 @@ public class ViewManager extends Application implements IViewManager {
     public void start(Stage primaryStage) throws Exception {
         instance = this;
         this.mainManager = (MainManager) LlsApi.getController();
-        this.state = mainManager.getCurrentState();
         this.stage = primaryStage;
-        loadScene(state);
+        changeState(mainManager.getCurrentState());
         stage.setResizable(true);
         stage.show();
     }

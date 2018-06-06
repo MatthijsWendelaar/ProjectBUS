@@ -7,6 +7,7 @@ import name.wendelaar.snowdb.data.DataObject;
 import name.wendelaar.snowdb.data.DataObjectCollection;
 import name.wendelaar.snowdb.data.model.Model;
 
+import java.sql.Date;
 import java.sql.Timestamp;
 import java.util.Collection;
 import java.util.HashMap;
@@ -99,6 +100,19 @@ public class Item extends Model {
         dataObject.set("user_id", null);
         dataObject.set("loaned_out_at", null);
         dataObject.set("loaned_out", 0);
+    }
+
+    public void loanOutItem(User user) {
+        dataObject.set("user_id", user.getId());
+        dataObject.set("loaned_out_at", new Timestamp(System.currentTimeMillis()));
+        dataObject.set("loaned_out", 1);
+    }
+
+    public void printInfo() {
+        for (String s : dataObject.getModifiedColumns()) {
+            System.out.println("MODI: " + s);
+            System.out.println("Value: " + dataObject.get(s));
+        }
     }
 
     protected Object getAttributeValue(String name) {

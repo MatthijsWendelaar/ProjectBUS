@@ -4,6 +4,7 @@ import name.wendelaar.projectbus.database.models.Item;
 import name.wendelaar.projectbus.database.models.ItemAttribute;
 import name.wendelaar.projectbus.database.models.ItemType;
 import name.wendelaar.projectbus.database.models.User;
+import name.wendelaar.projectbus.main.LlsApi;
 import name.wendelaar.projectbus.manager.IItemManager;
 import name.wendelaar.projectbus.main.MainManager;
 import name.wendelaar.simplevalidator.BoolValidator;
@@ -15,6 +16,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.concurrent.Future;
 
 public class ItemManager implements IItemManager {
 
@@ -49,7 +51,8 @@ public class ItemManager implements IItemManager {
             return;
         }
 
-        item.setUser(borrower);
+        item.loanOutItem(borrower);
+        item.printInfo();
         Manager.saveModel(item);
     }
 
@@ -81,7 +84,6 @@ public class ItemManager implements IItemManager {
             List<DataObject> dataObjects = Manager.create().prepare("SELECT * FROM item_attribute_values INNER JOIN item_type_attribute ON item_attribute_values.item_type_attribute_id = item_type_attribute.id INNER JOIN attribute ON item_type_attribute.attribute_id = attribute.id WHERE item_attribute_values.item_id = ?")
                     .setValue(item.getId())
                     .find();
-
             for (DataObject dataObject : dataObjects) {
                 itemAttributes.add(new ItemAttribute((DataObjectCollection) dataObject));
             }

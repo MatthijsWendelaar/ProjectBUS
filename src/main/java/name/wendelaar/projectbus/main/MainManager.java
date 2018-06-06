@@ -1,5 +1,6 @@
 package name.wendelaar.projectbus.main;
 
+import name.wendelaar.projectbus.database.concurrency.factory.DatabaseThreadFactory;
 import name.wendelaar.projectbus.view.ViewManager;
 import name.wendelaar.projectbus.view.ViewState;
 import name.wendelaar.snowdb.SnowDB;
@@ -9,7 +10,13 @@ import name.wendelaar.projectbus.database.manager.ItemManager;
 import name.wendelaar.projectbus.database.manager.ReservationManager;
 import name.wendelaar.projectbus.manager.*;
 
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
 public class MainManager implements IHeadController {
+
+    //Thread related fields
+    private ExecutorService executorService;
 
     //Manager related fields
     private HeadUserManager userManager;
@@ -26,6 +33,7 @@ public class MainManager implements IHeadController {
         } catch (SnowDBException ex) {
             ex.printStackTrace();
         }
+        executorService = Executors.newFixedThreadPool(10, new DatabaseThreadFactory("DB_Thread_"));
 
         LlsApi.receiveController(this);
         this.state = state;
@@ -66,5 +74,8 @@ public class MainManager implements IHeadController {
         return viewManager;
     }
 
-
+    @Override
+    public ExecutorService getExecutorService() {
+        return executorService;
+    }
 }

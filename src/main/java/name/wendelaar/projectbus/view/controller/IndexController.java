@@ -9,20 +9,22 @@ import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
 import javafx.scene.input.MouseButton;
 import javafx.scene.layout.AnchorPane;
-import name.wendelaar.projectbus.database.models.User;
-import name.wendelaar.projectbus.main.LlsApi;
-import name.wendelaar.projectbus.database.models.Book;
+import name.wendelaar.projectbus.database.concurrency.DatabaseExecutorWrapper;
 import name.wendelaar.projectbus.database.models.Item;
 import name.wendelaar.projectbus.database.models.ItemAttribute;
+import name.wendelaar.projectbus.database.models.User;
+import name.wendelaar.projectbus.database.concurrency.tasks.SimpleReceiveTask;
+import name.wendelaar.projectbus.database.concurrency.tasks.SimpleTask;
+import name.wendelaar.projectbus.main.LlsApi;
+import name.wendelaar.projectbus.manager.IItemManager;
 import name.wendelaar.projectbus.util.ChainedLinkedHashMap;
 import name.wendelaar.projectbus.view.parts.BusAlert;
 import name.wendelaar.projectbus.view.parts.TableBuilder;
-import name.wendelaar.snowdb.data.DataObject;
-import name.wendelaar.snowdb.data.DataObjectCollection;
-import name.wendelaar.snowdb.manager.Manager;
 
-import java.sql.SQLException;
-import java.util.*;
+import java.util.Collection;
+import java.util.Map;
+import java.util.Optional;
+import java.util.concurrent.ExecutorService;
 
 public class IndexController extends Controller {
 
@@ -37,39 +39,11 @@ public class IndexController extends Controller {
 
     private Node lastClicked = null;
 
-    private TableView itemView;
+    private TableView<Item> itemView;
 
     @Override
     public String getTitle() {
         return title;
-    }
-
-    public IndexController() {
-        try {
-            DataObject dataObject = Manager.create().prepare("SELECT * FROM item INNER JOIN item_type ON item.item_type_id = item_type.id WHERE item_type.id = ? LIMIT 1")
-                    .setValue(1)
-                    .findOne();
-            Book book = new Book((DataObjectCollection) dataObject);
-            List<DataObject> dataObjects = Manager.create().prepare("SELECT * FROM item_attribute_values INNER JOIN item_type_attribute ON item_attribute_values.item_type_attribute_id = item_type_attribute.id INNER JOIN attribute ON item_type_attribute.attribute_id = attribute.id WHERE item_attribute_values.item_id = ?")
-                    .setValue(book.getId())
-                    .find();
-
-            List<ItemAttribute> itemAttributes = new ArrayList<>();
-
-            for (DataObject dataObject2 : dataObjects) {
-                ItemAttribute attribute = new ItemAttribute((DataObjectCollection) dataObject2);
-                itemAttributes.add(attribute);
-            }
-
-            book.setAttributes(itemAttributes);
-
-            System.out.println("Author: " + book.getAuthor());
-            System.out.println("ISBN: " + book.getISBN());
-            System.out.println("Title/Name: " + book.getName());
-            System.out.println("Loaned out count: " + book.getLoanedOutCount());
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
     }
 
     @FXML
@@ -79,7 +53,20 @@ public class IndexController extends Controller {
             return;
         }
         lastClicked = loanedItemsButton;
-        Collection<Item> items = LlsApi.getItemManager().getItemsOfUser(LlsApi.getAuthManager().getCurrentUser());
+        ExecutorService service = LlsApi.getController().getExecutorService();
+
+        SimpleTask simpleTask = new SimpleTask();
+
+        simpleTask.setOnSucceeded(t -> {
+            itemView.getItems().addAll(simpleTask.getValue());
+            for (Item item : simpleTask.getValue()) {
+                System.out.println(item.getId());
+                System.out.println(item.getName());
+                System.out.println();
+            }
+        });
+
+        service.submit(simpleTask);
 
         itemView = new TableBuilder<Item, String>().addColumn("Name", "Name")
                 .addColumn("Type", "TypeName").addColumn("Date Loaned", "LoanedOutDate")
@@ -91,29 +78,42 @@ public class IndexController extends Controller {
                 if (event.getClickCount() == 2 && event.getButton().equals(MouseButton.PRIMARY) && !row.isEmpty()) {
                     Item item = row.getItem();
 
-                    Collection<ItemAttribute> attributes = LlsApi.getItemManager().getAttributesOfItem(item);
+                    SimpleReceiveTask<Collection<ItemAttribute>> task = new SimpleReceiveTask<Collection<ItemAttribute>>() {
 
-                    ChainedLinkedHashMap<String, Object> map = new ChainedLinkedHashMap<>();
-                    map.add("Id: ", item.getId()).add("Name: ", item.getName()).add("Too Late: ", item.getToLateToString())
-                            .add("Type: ", item.getTypeName()).add("Date Loaned: ", item.getLoanedOutDate());
+                        @Override
+                        public Collection<ItemAttribute> execute() {
+                            return LlsApi.getItemManager().getAttributesOfItem(item);
+                        }
+                    };
 
-                    for (ItemAttribute attribute : attributes) {
-                        map.add(attribute.getAttributeName() + ": ", attribute.getAttributeValue());
-                    }
+                    task.setOnSucceeded(t -> {
+                        ChainedLinkedHashMap<String, Object> map = new ChainedLinkedHashMap<>();
+                        map.add("Id: ", item.getId()).add("Name: ", item.getName()).add("Too Late: ", item.getToLateToString())
+                                .add("Type: ", item.getTypeName()).add("Date Loaned: ", item.getLoanedOutDate());
 
-                    BusAlert alert = buildAlert(map).addButton(new ButtonType("Return Item", ButtonData.LEFT));
+                        for (ItemAttribute attribute : task.getValue()) {
+                            map.add(attribute.getAttributeName() + ": ", attribute.getAttributeValue());
+                        }
 
-                    Optional<ButtonType> buttonType = alert.showAndWait();
-                    if (buttonType.isPresent() && buttonType.get().getButtonData().equals(ButtonData.LEFT)) {
-                        LlsApi.getItemManager().returnItem(item);
-                        itemView.getItems().remove(item);
-                    }
+                        BusAlert alert = buildAlert(map).addButton(new ButtonType("Return Item", ButtonData.LEFT));
+
+                        Optional<ButtonType> buttonType = alert.showAndWait();
+                        if (buttonType.isPresent() && buttonType.get().getButtonData().equals(ButtonData.LEFT)) {
+                            service.submit(new Runnable() {
+                                @Override
+                                public void run() {
+                                    LlsApi.getItemManager().returnItem(item);
+                                }
+                            });
+                            itemView.getItems().remove(item);
+                        }
+                    });
+
+                    service.submit(task);
                 }
             });
             return row;
         });
-
-        itemView.getItems().addAll(items);
 
         showDataPane.getChildren().add(itemView);
     }
@@ -124,53 +124,90 @@ public class IndexController extends Controller {
             System.out.println("Lekker peuh");
             return;
         }
+
         lastClicked = availableItemsButton;
-        Collection<Item> items = LlsApi.getItemManager().getItemsNotOfUser(LlsApi.getAuthManager().getCurrentUser());
+
+        DatabaseExecutorWrapper wrapper = new DatabaseExecutorWrapper(LlsApi.getController().getExecutorService());
+        IItemManager itemManager = LlsApi.getItemManager();
+
+        SimpleReceiveTask<Collection<Item>> receiveItemsTask = new SimpleReceiveTask<Collection<Item>>() {
+            @Override
+            public Collection<Item> execute() {
+                return itemManager.getItemsNotOfUser(LlsApi.getAuthManager().getCurrentUser());
+            }
+        };
+
+        receiveItemsTask.setOnSucceeded(w -> {
+            itemView.getItems().addAll(receiveItemsTask.getValue());
+        });
+
+        wrapper.submit(receiveItemsTask);
 
         itemView = new TableBuilder<Item, String>().addColumn("Name", "Name")
                 .addColumn("Type", "TypeName").addColumn("Loaned Out", "LoanedOutToString")
                 .getTableView();
 
         itemView.setRowFactory(tv -> {
-            TableRow<Item> tableRow = new TableRow<>();
-            tableRow.setOnMouseClicked(event -> {
-                if (event.getClickCount() == 2 && MouseButton.PRIMARY.equals(event.getButton()) && !tableRow.isEmpty()) {
-                    Item item = tableRow.getItem();
+            TableRow<Item> itemTableRow = new TableRow<>();
+            itemTableRow.setOnMouseClicked(event -> {
+                if (event.getClickCount() != 2 || !MouseButton.PRIMARY.equals(event.getButton()) || itemTableRow.isEmpty()) {
+                    return;
+                }
 
-                    Collection<ItemAttribute> attributes = LlsApi.getItemManager().getAttributesOfItem(item);
+                Item item = itemTableRow.getItem();
+
+                SimpleReceiveTask<Collection<ItemAttribute>> receiveAttributesTask = new SimpleReceiveTask<Collection<ItemAttribute>>() {
+                    @Override
+                    public Collection<ItemAttribute> execute() {
+                        return itemManager.getAttributesOfItem(item);
+                    }
+                };
+
+                receiveAttributesTask.setOnSucceeded(w -> {
 
                     ChainedLinkedHashMap<String, Object> map = new ChainedLinkedHashMap<>();
+
                     map.add("Id: ", item.getId()).add("Name: ", item.getName()).add("Type: ", item.getTypeName())
                             .add("Loaned Out: ", item.getLoanedOutToString());
 
-                    for (ItemAttribute attribute : attributes) {
+                    for (ItemAttribute attribute : receiveAttributesTask.getValue()) {
                         map.add(attribute.getAttributeName() + ": ", attribute.getAttributeValue());
                     }
 
                     BusAlert alert = buildAlert(map);
 
                     if (item.isLoanedOut()) {
-                        alert.addButton(new ButtonType("Reserve"));
+                        alert.addButton(new ButtonType("Reserve", ButtonData.LEFT));
                     } else {
-                        alert.addButton(new ButtonType("Loan"));
+                        alert.addButton(new ButtonType("Loan", ButtonData.LEFT));
                     }
 
                     Optional<ButtonType> buttonType = alert.showAndWait();
-                    if (buttonType.isPresent() && buttonType.get().getButtonData().equals(ButtonData.LEFT)) {
-                        User user = LlsApi.getAuthManager().getCurrentUser();
-                        if (item.isLoanedOut()) {
-                            LlsApi.getReservationManager().addReservation(user, item);
-                        } else {
-                            LlsApi.getItemManager().loanOutItem(user, item);
-                        }
-                        itemView.getItems().remove(item);
+                    if (!buttonType.isPresent() || !buttonType.get().getButtonData().equals(ButtonData.LEFT)) {
+                        return;
                     }
-                }
-            });
-            return tableRow;
-        });
 
-        itemView.getItems().addAll(items);
+                    User user = LlsApi.getAuthManager().getCurrentUser();
+
+                    if (item.isLoanedOut()) {
+                        wrapper.submitRunnable(() -> {
+                            LlsApi.getReservationManager().addReservation(user,item);
+                        });
+                        LlsApi.getReservationManager().addReservation(user, item);
+                    } else {
+                        wrapper.submitRunnable(() -> {
+                            itemManager.loanOutItem(user, item);
+                        });
+                    }
+
+                    itemView.getItems().remove(item);
+                });
+
+                wrapper.submit(receiveAttributesTask);
+
+            });
+            return itemTableRow;
+        });
 
         showDataPane.getChildren().add(itemView);
     }

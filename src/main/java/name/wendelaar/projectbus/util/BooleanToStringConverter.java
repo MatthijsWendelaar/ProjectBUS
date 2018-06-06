@@ -7,7 +7,7 @@ public class BooleanToStringConverter {
             return booleanConvert((Boolean) object);
         }
         if (object instanceof Number) {
-            return  booleanConvert(((Number) object).intValue() != 0);
+            return booleanConvert(((Number) object).intValue() != 0);
         }
         return booleanConvert(false);
     }
