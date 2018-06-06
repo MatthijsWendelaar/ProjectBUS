@@ -4,7 +4,7 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
-import name.wendelaar.projectbus.LlsApi;
+import name.wendelaar.projectbus.main.LlsApi;
 import name.wendelaar.projectbus.manager.IAuthenticationManager;
 import name.wendelaar.projectbus.validator.InputValidator;
 import name.wendelaar.projectbus.validator.ValidatorException;

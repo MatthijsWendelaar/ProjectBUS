@@ -19,6 +19,8 @@ public interface IItemManager {
 
     public Collection<Item> getItemsOfUser(User user);
 
+    public Collection<Item> getItemsNotOfUser(User user);
+
     public Collection<ItemAttribute> getAttributesOfItem(Item item);
 
     public Collection<Item> getItems();

@@ -1,5 +1,6 @@
 package name.wendelaar.projectbus.database.models;
 
+import name.wendelaar.projectbus.util.BooleanToStringConverter;
 import name.wendelaar.simplevalidator.ExcepValidator;
 import name.wendelaar.snowdb.annotation.Data;
 import name.wendelaar.snowdb.data.DataObject;
@@ -52,12 +53,27 @@ public class Item extends Model {
         return (boolean) dataObject.get("to_late");
     }
 
+    public boolean isLoanedOut() {
+        return (boolean) dataObject.get("loaned_out");
+    }
+
     public String getToLateToString() {
-        return (boolean) dataObject.get("to_late") ? "Yes" : "No";
+        return BooleanToStringConverter.convert(dataObject.get("to_late"));
+    }
+
+    public String getLoanedOutToString() {
+        return BooleanToStringConverter.convert(dataObject.get("loaned_out"));
     }
 
     public String getTypeName() {
         return itemType.getName();
+    }
+
+    public void setUser(User user) {
+        if (user == null || user.getId() == 0) {
+            return;
+        }
+        dataObject.set("user_id", user.getId());
     }
 
     public void setAttributes(Collection<ItemAttribute> attributes) {
@@ -83,8 +99,6 @@ public class Item extends Model {
         dataObject.set("user_id", null);
         dataObject.set("loaned_out_at", null);
         dataObject.set("loaned_out", 0);
-        char c = 65;
-        System.out.println("WHta:? " + c);
     }
 
     protected Object getAttributeValue(String name) {

@@ -1,17 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.web.*?>
-<?import java.lang.*?>
-<?import java.util.*?>
-<?import javafx.scene.*?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.Pane?>
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="name.wendelaar.projectbus.view.controller.IndexController">
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/9.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="name.wendelaar.projectbus.view.controller.IndexController">
    <children>
       <Pane prefHeight="400.0" prefWidth="137.0" style="-fx-background-color: blue;">
          <children>
-            <Button fx:id="loanedItemsButton" layoutY="53.0" mnemonicParsing="false" onAction="#onShowLoanedItems" prefHeight="25.0" prefWidth="137.0" text="Loaned Items" />
+            <Button fx:id="loanedItemsButton" layoutY="56.0" mnemonicParsing="false" onAction="#onShowLoanedItems" prefHeight="25.0" prefWidth="137.0" text="Loaned Items" />
+            <Button fx:id="availableItemsButton" layoutY="92.0" mnemonicParsing="false" onAction="#onShowAvailableItems" prefHeight="25.0" prefWidth="137.0" text="Available Items" />
          </children>
       </Pane>
       <AnchorPane fx:id="showDataPane" layoutX="137.0" prefHeight="400.0" prefWidth="463.0" />

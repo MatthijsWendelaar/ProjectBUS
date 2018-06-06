@@ -1,8 +1,9 @@
-package name.wendelaar.projectbus.view;
+package name.wendelaar.projectbus.main;
 
+import name.wendelaar.projectbus.view.ViewManager;
+import name.wendelaar.projectbus.view.ViewState;
 import name.wendelaar.snowdb.SnowDB;
 import name.wendelaar.snowdb.exceptions.SnowDBException;
-import name.wendelaar.projectbus.LlsApi;
 import name.wendelaar.projectbus.database.manager.HeadUserManager;
 import name.wendelaar.projectbus.database.manager.ItemManager;
 import name.wendelaar.projectbus.database.manager.ReservationManager;

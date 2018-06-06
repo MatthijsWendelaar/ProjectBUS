@@ -1,12 +1,12 @@
 package name.wendelaar.projectbus.database.manager;
 
-import name.wendelaar.projectbus.LlsApi;
 import name.wendelaar.projectbus.database.models.Item;
 import name.wendelaar.projectbus.database.models.ItemAttribute;
 import name.wendelaar.projectbus.database.models.ItemType;
 import name.wendelaar.projectbus.database.models.User;
 import name.wendelaar.projectbus.manager.IItemManager;
-import name.wendelaar.projectbus.view.MainManager;
+import name.wendelaar.projectbus.main.MainManager;
+import name.wendelaar.simplevalidator.BoolValidator;
 import name.wendelaar.snowdb.data.DataObject;
 import name.wendelaar.snowdb.data.DataObjectCollection;
 import name.wendelaar.snowdb.manager.Manager;
@@ -42,29 +42,32 @@ public class ItemManager implements IItemManager {
 
     @Override
     public void loanOutItem(User borrower, Item item) {
+        if (!BoolValidator.notNull(borrower, item)) {
+            return;
+        }
+        if (borrower.getId() == 0 || item.getId() == 0) {
+            return;
+        }
 
+        item.setUser(borrower);
+        Manager.saveModel(item);
     }
 
     @Override
     public Collection<Item> getItemsOfUser(User user) {
-        List<Item> items = new ArrayList<>();
         if (user == null || user.getId() == 0) {
-            return items;
+            return null;
         }
 
-        try {
-            List<DataObject> dataObjects = Manager.create().prepare("SELECT * FROM item INNER JOIN item_type ON item.item_type_id = item_type.id WHERE item.user_id = ?")
-                    .setValue(user.getId())
-                    .find();
+        return requestItems("SELECT * FROM item INNER JOIN item_type ON item.item_type_id = item_type.id WHERE item.user_id = ?", user.getId());
+    }
 
-            for (DataObject dataObject : dataObjects) {
-                items.add(new Item((DataObjectCollection) dataObject, "all"));
-            }
-        } catch (SQLException ex) {
-            ex.printStackTrace();
-            return items;
+    @Override
+    public Collection<Item> getItemsNotOfUser(User user) {
+        if (user == null || user.getId() == 0) {
+            return null;
         }
-        return items;
+        return requestItems("SELECT * FROM item INNER JOIN item_type ON item.item_type_id = item_type.id WHERE item.user_id <> ? OR item.user_id IS NULL", user.getId());
     }
 
     @Override
@@ -92,5 +95,26 @@ public class ItemManager implements IItemManager {
     @Override
     public Collection<Item> getItems() {
         return null;
+    }
+
+    private Collection<Item> requestItems(String query, Object... objects) {
+        List<Item> items = new ArrayList<>();
+
+        try {
+            Manager manager = Manager.create().prepare(query);
+
+            for (Object o : objects) {
+                manager.setValue(o);
+            }
+            List<DataObject> dataObjects = manager.find();
+
+            for (DataObject dataObject : dataObjects) {
+                items.add(new Item((DataObjectCollection) dataObject, "all"));
+            }
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+            return items;
+        }
+        return items;
     }
 }

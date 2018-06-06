@@ -6,7 +6,7 @@ import name.wendelaar.snowdb.manager.Manager;
 import name.wendelaar.projectbus.database.models.User;
 import name.wendelaar.projectbus.manager.IAuthenticationManager;
 import name.wendelaar.projectbus.manager.IUserManager;
-import name.wendelaar.projectbus.view.MainManager;
+import name.wendelaar.projectbus.main.MainManager;
 
 import java.sql.SQLException;
 import java.util.ArrayList;

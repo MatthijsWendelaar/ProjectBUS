@@ -4,7 +4,7 @@ import name.wendelaar.projectbus.database.models.Item;
 import name.wendelaar.projectbus.database.models.Reservation;
 import name.wendelaar.projectbus.database.models.User;
 import name.wendelaar.projectbus.manager.IReservationManager;
-import name.wendelaar.projectbus.view.MainManager;
+import name.wendelaar.projectbus.main.MainManager;
 
 import java.util.Collection;
 

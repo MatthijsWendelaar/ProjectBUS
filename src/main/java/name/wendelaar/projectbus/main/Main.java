@@ -1,6 +1,5 @@
-package name.wendelaar.projectbus;
+package name.wendelaar.projectbus.main;
 
-import name.wendelaar.projectbus.view.MainManager;
 import name.wendelaar.projectbus.view.ViewState;
 
 public class Main {
