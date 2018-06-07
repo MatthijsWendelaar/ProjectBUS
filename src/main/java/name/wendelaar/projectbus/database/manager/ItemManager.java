@@ -70,7 +70,7 @@ public class ItemManager implements IItemManager {
         if (user == null || user.getId() == 0) {
             return null;
         }
-        return requestItems("SELECT * FROM item INNER JOIN item_type ON item.item_type_id = item_type.id WHERE item.user_id <> ? OR item.user_id IS NULL", user.getId());
+        return requestItems("SELECT item.*, item_type.* FROM item INNER JOIN item_type ON item.item_type_id = item_type.id WHERE item.id NOT IN( SELECT reservation.item_id FROM reservation WHERE reservation.user_id = ?) AND item.user_id <> ? OR item.user_id IS NULL", user.getId(), user.getId());
     }
 
     @Override
@@ -99,7 +99,8 @@ public class ItemManager implements IItemManager {
         return null;
     }
 
-    private Collection<Item> requestItems(String query, Object... objects) {
+    @Override
+    public Collection<Item> requestItems(String query, Object... objects) {
         List<Item> items = new ArrayList<>();
 
         try {

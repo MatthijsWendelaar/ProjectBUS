@@ -19,8 +19,10 @@ import name.wendelaar.projectbus.util.ChainedLinkedHashMap;
 import name.wendelaar.projectbus.view.controller.Controller;
 import name.wendelaar.projectbus.view.parts.BusAlert;
 import name.wendelaar.projectbus.view.parts.TableBuilder;
+import name.wendelaar.snowdb.data.DataObject;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ExecutorService;
@@ -215,7 +217,80 @@ public class UserIndexController extends Controller {
             return;
         }
 
+        ExecutorService service = LlsApi.getController().getExecutorService();
+        IItemManager itemManager = LlsApi.getItemManager();
+        User user = LlsApi.getAuthManager().getCurrentUser();
+
+        SimpleReceiveTask<Collection<Item>> receiveItemsTask = new SimpleReceiveTask<Collection<Item>>() {
+            @Override
+            public Collection<Item> execute() {
+
+                return itemManager.requestItems("SELECT item.*, item_type.* FROM reservation INNER JOIN item ON reservation.item_id = item.id INNER JOIN item_type ON item.item_type_id = item_type.id WHERE reservation.user_id = ?", user.getId());
+            }
+        };
+
+        receiveItemsTask.setOnSucceeded(w -> {
+            itemView.getItems().addAll(receiveItemsTask.getValue());
+        });
+
+        service.submit(receiveItemsTask);
+
+        itemView = new TableBuilder<Item, String>().addColumn("Name", "Name")
+                .addColumn("Type", "TypeName").addColumn("Loaned Out", "LoanedOutToString")
+                .getTableView();
+
+        itemView.setRowFactory(tv -> {
+            TableRow<Item> itemTableRow = new TableRow<>();
+            itemTableRow.setOnMouseClicked(event -> {
+                if (event.getClickCount() != 2 || !MouseButton.PRIMARY.equals(event.getButton()) || itemTableRow.isEmpty()) {
+                    return;
+                }
+
+                Item item = itemTableRow.getItem();
+
+                SimpleReceiveTask<Collection<ItemAttribute>> receiveAttributesTask = new SimpleReceiveTask<Collection<ItemAttribute>>() {
+                    @Override
+                    public Collection<ItemAttribute> execute() {
+                        return itemManager.getAttributesOfItem(item);
+                    }
+                };
+
+                receiveAttributesTask.setOnSucceeded(w -> {
+
+                    ChainedLinkedHashMap<String, Object> map = new ChainedLinkedHashMap<>();
+
+                    map.add("Id: ", item.getId()).add("Name: ", item.getName()).add("Type: ", item.getTypeName())
+                            .add("Loaned Out: ", item.getLoanedOutToString());
+
+                    for (ItemAttribute attribute : receiveAttributesTask.getValue()) {
+                        map.add(attribute.getAttributeName() + ": ", attribute.getAttributeValue());
+                    }
+
+                    BusAlert alert = buildAlert(map);
+                    alert.addButton(new ButtonType("Cancel Reservation", ButtonData.LEFT));
+
+                    Optional<ButtonType> buttonType = alert.showAndWait();
+                    if (!buttonType.isPresent() || !buttonType.get().getButtonData().equals(ButtonData.LEFT)) {
+                        return;
+                    }
+
+                    service.submit(() -> {
+                        LlsApi.getReservationManager().removeReservation(user, item);
+                    });
+                    itemView.getItems().remove(item);
+                });
+
+                service.submit(receiveAttributesTask);
+
+            });
+            return itemTableRow;
+        });
+
+        showDataPane.getChildren().add(itemView);
+
         lastClicked = reservedItemsButton;
+
+
     }
 
     private BusAlert buildAlert(Map<String, Object> values) {

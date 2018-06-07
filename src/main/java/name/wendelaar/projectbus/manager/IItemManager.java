@@ -23,5 +23,7 @@ public interface IItemManager {
 
     public Collection<ItemAttribute> getAttributesOfItem(Item item);
 
+    public Collection<Item> requestItems(String query, Object... objects);
+
     public Collection<Item> getItems();
 }
