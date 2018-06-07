@@ -4,8 +4,6 @@ import name.wendelaar.projectbus.database.models.UserData;
 import name.wendelaar.snowdb.data.DataObject;
 import name.wendelaar.snowdb.manager.Manager;
 import name.wendelaar.projectbus.database.models.User;
-import name.wendelaar.projectbus.manager.IAuthenticationManager;
-import name.wendelaar.projectbus.manager.IUserManager;
 import name.wendelaar.projectbus.main.MainManager;
 
 import java.sql.SQLException;

@@ -1,4 +1,4 @@
-package name.wendelaar.projectbus.manager;
+package name.wendelaar.projectbus.database.manager;
 
 import name.wendelaar.projectbus.database.models.User;
 

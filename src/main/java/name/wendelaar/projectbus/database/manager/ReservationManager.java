@@ -6,7 +6,6 @@ import name.wendelaar.projectbus.database.models.User;
 import name.wendelaar.projectbus.database.models.factory.IReservationFactory;
 import name.wendelaar.projectbus.database.models.factory.ReservationFactory;
 import name.wendelaar.projectbus.main.MainManager;
-import name.wendelaar.projectbus.manager.IReservationManager;
 import name.wendelaar.simplevalidator.BoolValidator;
 import name.wendelaar.snowdb.manager.Manager;
 

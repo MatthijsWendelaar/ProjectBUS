@@ -1,7 +1,7 @@
 package name.wendelaar.projectbus.view.controller;
 
 import javafx.stage.Stage;
-import name.wendelaar.projectbus.manager.IViewManager;
+import name.wendelaar.projectbus.view.IViewManager;
 
 public abstract class Controller {
 

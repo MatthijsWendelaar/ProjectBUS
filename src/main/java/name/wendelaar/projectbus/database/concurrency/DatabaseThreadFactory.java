@@ -1,4 +1,4 @@
-package name.wendelaar.projectbus.database.concurrency.factory;
+package name.wendelaar.projectbus.database.concurrency;
 
 import java.util.concurrent.ThreadFactory;
 

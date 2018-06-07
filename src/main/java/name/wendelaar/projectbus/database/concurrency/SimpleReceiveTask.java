@@ -1,4 +1,4 @@
-package name.wendelaar.projectbus.database.concurrency.tasks;
+package name.wendelaar.projectbus.database.concurrency;
 
 import javafx.concurrent.Task;
 

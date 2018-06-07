@@ -1,14 +1,12 @@
 package name.wendelaar.projectbus.main;
 
-import name.wendelaar.projectbus.database.concurrency.factory.DatabaseThreadFactory;
+import name.wendelaar.projectbus.database.concurrency.DatabaseThreadFactory;
+import name.wendelaar.projectbus.database.manager.*;
+import name.wendelaar.projectbus.view.IViewManager;
 import name.wendelaar.projectbus.view.ViewManager;
 import name.wendelaar.projectbus.view.ViewState;
 import name.wendelaar.snowdb.SnowDB;
 import name.wendelaar.snowdb.exceptions.SnowDBException;
-import name.wendelaar.projectbus.database.manager.HeadUserManager;
-import name.wendelaar.projectbus.database.manager.ItemManager;
-import name.wendelaar.projectbus.database.manager.ReservationManager;
-import name.wendelaar.projectbus.manager.*;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;

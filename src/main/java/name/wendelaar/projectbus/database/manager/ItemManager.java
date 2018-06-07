@@ -4,8 +4,6 @@ import name.wendelaar.projectbus.database.models.Item;
 import name.wendelaar.projectbus.database.models.ItemAttribute;
 import name.wendelaar.projectbus.database.models.ItemType;
 import name.wendelaar.projectbus.database.models.User;
-import name.wendelaar.projectbus.main.LlsApi;
-import name.wendelaar.projectbus.manager.IItemManager;
 import name.wendelaar.projectbus.main.MainManager;
 import name.wendelaar.simplevalidator.BoolValidator;
 import name.wendelaar.snowdb.data.DataObject;
@@ -16,7 +14,6 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.concurrent.Future;
 
 public class ItemManager implements IItemManager {
 

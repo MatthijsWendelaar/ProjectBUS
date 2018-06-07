@@ -1,6 +1,10 @@
 package name.wendelaar.projectbus.main;
 
-import name.wendelaar.projectbus.manager.*;
+import name.wendelaar.projectbus.database.manager.IAuthenticationManager;
+import name.wendelaar.projectbus.database.manager.IItemManager;
+import name.wendelaar.projectbus.database.manager.IReservationManager;
+import name.wendelaar.projectbus.database.manager.IUserManager;
+import name.wendelaar.projectbus.view.IViewManager;
 
 public class LlsApi {
 

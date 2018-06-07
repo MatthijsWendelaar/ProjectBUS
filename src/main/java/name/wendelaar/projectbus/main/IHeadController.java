@@ -1,4 +1,4 @@
-package name.wendelaar.projectbus.manager;
+package name.wendelaar.projectbus.main;
 
 import name.wendelaar.projectbus.view.ViewState;
 

@@ -1,6 +1,7 @@
-package name.wendelaar.projectbus.manager;
+package name.wendelaar.projectbus.view;
 
 import javafx.stage.Stage;
+import name.wendelaar.projectbus.main.IHeadController;
 import name.wendelaar.projectbus.view.ViewState;
 
 public interface IViewManager {
