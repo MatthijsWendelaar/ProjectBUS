@@ -43,7 +43,7 @@
                            <font>
                               <Font size="15.0" />
                            </font></PasswordField>
-                        <Button alignment="CENTER" onAction="#tryLogin" prefWidth="250" styleClass="primary-bg" text="Login" textFill="WHITE" GridPane.columnIndex="0" GridPane.columnSpan="2" GridPane.rowIndex="5">
+                        <Button alignment="CENTER" onAction="#tryLogin" prefWidth="250" styleClass="primary-button" text="Login" textFill="WHITE" GridPane.columnIndex="0" GridPane.columnSpan="2" GridPane.rowIndex="5">
                            <GridPane.margin>
                               <Insets top="10.0" />
                            </GridPane.margin>

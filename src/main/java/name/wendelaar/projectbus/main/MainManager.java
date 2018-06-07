@@ -33,7 +33,7 @@ public class MainManager implements IHeadController {
         } catch (SnowDBException ex) {
             ex.printStackTrace();
         }
-        executorService = Executors.newFixedThreadPool(10, new DatabaseThreadFactory("DB_Thread_"));
+        executorService = Executors.newFixedThreadPool(5, new DatabaseThreadFactory("DB_Thread_"));
 
         LlsApi.receiveController(this);
         this.state = state;

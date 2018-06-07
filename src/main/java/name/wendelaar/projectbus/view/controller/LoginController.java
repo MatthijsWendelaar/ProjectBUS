@@ -4,6 +4,7 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
+import name.wendelaar.projectbus.database.concurrency.tasks.SimpleReceiveTask;
 import name.wendelaar.projectbus.main.LlsApi;
 import name.wendelaar.projectbus.manager.IAuthenticationManager;
 import name.wendelaar.projectbus.validator.InputValidator;
@@ -36,15 +37,28 @@ public class LoginController extends Controller {
             InputValidator.inputFilled("All fields need to be filled", username, password);
 
             IAuthenticationManager manager = LlsApi.getAuthManager();
-            boolean validAuth = manager.authenticate(username, password);
-            InputValidator.isTrue("The credentials did not match", validAuth);
+            SimpleReceiveTask<Boolean> authenticateTask = new SimpleReceiveTask<Boolean>() {
+                @Override
+                public Boolean execute() {
+                    return manager.authenticate(username, password);
+                }
+            };
 
-            if (manager.getCurrentUser().isLiberian()) {
-                viewManager.changeState(ViewState.INDEX_DEFAULT);//TODO: change this to LIBERIAN_DEFAULT
-            } else {
-                viewManager.changeState(ViewState.INDEX_DEFAULT);
-            }
-            //new BusAlert().addDefaultStyleSheet().setMessage("Lekker mwoan het is je gelukt! je naam is: " + LlsApi.getAuthenticationManager().getCurrentUser().getUsername()).showAndWait();
+            authenticateTask.setOnSucceeded(wk -> {
+                try {
+                    InputValidator.isTrue("The credentials did not match", authenticateTask.getValue());
+                } catch (ValidatorException ex) {
+                    return;
+                }
+
+                if (manager.getCurrentUser().isLiberian()) {
+                    viewManager.changeState(ViewState.INDEX_DEFAULT);//TODO: change this to LIBERIAN_DEFAULT
+                } else {
+                    viewManager.changeState(ViewState.INDEX_DEFAULT);
+                }
+            });
+
+            LlsApi.getController().getExecutorService().submit(authenticateTask);
         } catch (ValidatorException ex) {
         }
     }

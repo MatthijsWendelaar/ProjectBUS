@@ -1,4 +1,4 @@
-package name.wendelaar.projectbus.view.controller;
+package name.wendelaar.projectbus.view.controller.user;
 
 import javafx.fxml.FXML;
 import javafx.scene.Node;
@@ -9,15 +9,14 @@ import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
 import javafx.scene.input.MouseButton;
 import javafx.scene.layout.AnchorPane;
-import name.wendelaar.projectbus.database.concurrency.DatabaseExecutorWrapper;
+import name.wendelaar.projectbus.database.concurrency.tasks.SimpleReceiveTask;
 import name.wendelaar.projectbus.database.models.Item;
 import name.wendelaar.projectbus.database.models.ItemAttribute;
 import name.wendelaar.projectbus.database.models.User;
-import name.wendelaar.projectbus.database.concurrency.tasks.SimpleReceiveTask;
-import name.wendelaar.projectbus.database.concurrency.tasks.SimpleTask;
 import name.wendelaar.projectbus.main.LlsApi;
 import name.wendelaar.projectbus.manager.IItemManager;
 import name.wendelaar.projectbus.util.ChainedLinkedHashMap;
+import name.wendelaar.projectbus.view.controller.Controller;
 import name.wendelaar.projectbus.view.parts.BusAlert;
 import name.wendelaar.projectbus.view.parts.TableBuilder;
 
@@ -26,9 +25,9 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ExecutorService;
 
-public class IndexController extends Controller {
+public class UserIndexController extends Controller {
 
-    private String title = "Home";
+    private String title = "Dashboard";
 
     @FXML
     private AnchorPane showDataPane;
@@ -36,6 +35,8 @@ public class IndexController extends Controller {
     private Button loanedItemsButton;
     @FXML
     private Button availableItemsButton;
+    @FXML
+    private Button reservedItemsButton;
 
     private Node lastClicked = null;
 
@@ -49,24 +50,25 @@ public class IndexController extends Controller {
     @FXML
     private void onShowLoanedItems() {
         if (loanedItemsButton.equals(lastClicked)) {
-            System.out.println("Lekker peuh");
             return;
         }
         lastClicked = loanedItemsButton;
+
         ExecutorService service = LlsApi.getController().getExecutorService();
+        IItemManager itemManager = LlsApi.getController().getItemManager();
 
-        SimpleTask simpleTask = new SimpleTask();
-
-        simpleTask.setOnSucceeded(t -> {
-            itemView.getItems().addAll(simpleTask.getValue());
-            for (Item item : simpleTask.getValue()) {
-                System.out.println(item.getId());
-                System.out.println(item.getName());
-                System.out.println();
+        SimpleReceiveTask<Collection<Item>> receiveItemsTask = new SimpleReceiveTask<Collection<Item>>() {
+            @Override
+            public Collection<Item> execute() {
+                return itemManager.getItemsOfUser(LlsApi.getAuthManager().getCurrentUser());
             }
+        };
+
+        receiveItemsTask.setOnSucceeded(t -> {
+            itemView.getItems().addAll(receiveItemsTask.getValue());
         });
 
-        service.submit(simpleTask);
+        service.submit(receiveItemsTask);
 
         itemView = new TableBuilder<Item, String>().addColumn("Name", "Name")
                 .addColumn("Type", "TypeName").addColumn("Date Loaned", "LoanedOutDate")
@@ -78,20 +80,20 @@ public class IndexController extends Controller {
                 if (event.getClickCount() == 2 && event.getButton().equals(MouseButton.PRIMARY) && !row.isEmpty()) {
                     Item item = row.getItem();
 
-                    SimpleReceiveTask<Collection<ItemAttribute>> task = new SimpleReceiveTask<Collection<ItemAttribute>>() {
+                    SimpleReceiveTask<Collection<ItemAttribute>> receiveAttributesTask = new SimpleReceiveTask<Collection<ItemAttribute>>() {
 
                         @Override
                         public Collection<ItemAttribute> execute() {
-                            return LlsApi.getItemManager().getAttributesOfItem(item);
+                            return itemManager.getAttributesOfItem(item);
                         }
                     };
 
-                    task.setOnSucceeded(t -> {
+                    receiveAttributesTask.setOnSucceeded(t -> {
                         ChainedLinkedHashMap<String, Object> map = new ChainedLinkedHashMap<>();
                         map.add("Id: ", item.getId()).add("Name: ", item.getName()).add("Too Late: ", item.getToLateToString())
                                 .add("Type: ", item.getTypeName()).add("Date Loaned: ", item.getLoanedOutDate());
 
-                        for (ItemAttribute attribute : task.getValue()) {
+                        for (ItemAttribute attribute : receiveAttributesTask.getValue()) {
                             map.add(attribute.getAttributeName() + ": ", attribute.getAttributeValue());
                         }
 
@@ -99,17 +101,14 @@ public class IndexController extends Controller {
 
                         Optional<ButtonType> buttonType = alert.showAndWait();
                         if (buttonType.isPresent() && buttonType.get().getButtonData().equals(ButtonData.LEFT)) {
-                            service.submit(new Runnable() {
-                                @Override
-                                public void run() {
-                                    LlsApi.getItemManager().returnItem(item);
-                                }
+                            service.submit(() -> {
+                                itemManager.returnItem(item);
                             });
                             itemView.getItems().remove(item);
                         }
                     });
 
-                    service.submit(task);
+                    service.submit(receiveAttributesTask);
                 }
             });
             return row;
@@ -121,13 +120,12 @@ public class IndexController extends Controller {
     @FXML
     private void onShowAvailableItems() {
         if (availableItemsButton.equals(lastClicked)) {
-            System.out.println("Lekker peuh");
             return;
         }
 
         lastClicked = availableItemsButton;
 
-        DatabaseExecutorWrapper wrapper = new DatabaseExecutorWrapper(LlsApi.getController().getExecutorService());
+        ExecutorService service = LlsApi.getController().getExecutorService();
         IItemManager itemManager = LlsApi.getItemManager();
 
         SimpleReceiveTask<Collection<Item>> receiveItemsTask = new SimpleReceiveTask<Collection<Item>>() {
@@ -141,7 +139,7 @@ public class IndexController extends Controller {
             itemView.getItems().addAll(receiveItemsTask.getValue());
         });
 
-        wrapper.submit(receiveItemsTask);
+        service.submit(receiveItemsTask);
 
         itemView = new TableBuilder<Item, String>().addColumn("Name", "Name")
                 .addColumn("Type", "TypeName").addColumn("Loaned Out", "LoanedOutToString")
@@ -190,12 +188,11 @@ public class IndexController extends Controller {
                     User user = LlsApi.getAuthManager().getCurrentUser();
 
                     if (item.isLoanedOut()) {
-                        wrapper.submitRunnable(() -> {
-                            LlsApi.getReservationManager().addReservation(user,item);
+                        service.submit(() -> {
+                            LlsApi.getReservationManager().addReservation(user, item);
                         });
-                        LlsApi.getReservationManager().addReservation(user, item);
                     } else {
-                        wrapper.submitRunnable(() -> {
+                        service.submit(() -> {
                             itemManager.loanOutItem(user, item);
                         });
                     }
@@ -203,13 +200,22 @@ public class IndexController extends Controller {
                     itemView.getItems().remove(item);
                 });
 
-                wrapper.submit(receiveAttributesTask);
+                service.submit(receiveAttributesTask);
 
             });
             return itemTableRow;
         });
 
         showDataPane.getChildren().add(itemView);
+    }
+
+    @FXML
+    private void onShowReservedItems() {
+        if (reservedItemsButton.equals(lastClicked)) {
+            return;
+        }
+
+        lastClicked = reservedItemsButton;
     }
 
     private BusAlert buildAlert(Map<String, Object> values) {
