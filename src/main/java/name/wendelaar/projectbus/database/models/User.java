@@ -31,6 +31,14 @@ public class User extends Model {
         return object.equals(password);
     }
 
+    public void setAccountDisabled(boolean disabled) {
+        dataObject.set("disabled", disabled);
+    }
+
+    public boolean isAccountDisabled() {
+        return (boolean) dataObject.get("disabled");
+    }
+
     public void printAll() {
         for (Object o : dataObject.getAll()) {
             System.out.println(o);

@@ -22,26 +22,22 @@ public class HeadUserManager implements IUserManager, IAuthenticationManager {
 
     @Override
     public void createUser(User user) {
-
+        //TODO: add implementation
     }
 
     @Override
     public void deleteUser(User user) {
-        int id;
-        if (user == null || (id = user.getId()) == 0) {
+        if (user == null) {
             return;
         }
 
-        try {
-            Manager.create().prepare("DELETE FROM user WHERE user.id = ?", id).execute();
-        } catch (SQLException ex) {
-            ex.printStackTrace(); //TODO: Proper logging.
-        }
+        Manager.deleteModel(user);
     }
 
     @Override
     public void disableUser(User user) {
-
+        user.setAccountDisabled(!user.isAccountDisabled());
+        Manager.saveModel(user);
     }
 
     @Override
