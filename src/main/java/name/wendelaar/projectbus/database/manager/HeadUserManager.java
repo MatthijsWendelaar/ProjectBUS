@@ -27,7 +27,16 @@ public class HeadUserManager implements IUserManager, IAuthenticationManager {
 
     @Override
     public void deleteUser(User user) {
+        int id;
+        if (user == null || (id = user.getId()) == 0) {
+            return;
+        }
 
+        try {
+            Manager.create().prepare("DELETE FROM user WHERE user.id = ?", id).execute();
+        } catch (SQLException ex) {
+            ex.printStackTrace(); //TODO: Proper logging.
+        }
     }
 
     @Override
@@ -39,7 +48,12 @@ public class HeadUserManager implements IUserManager, IAuthenticationManager {
     public User getUser(int id) {
         User user = null;
         try {
-            user = new User(Manager.create().prepare("SELECT * FROM user WHERE id = ? LIMIT 1", id).findOne());
+            DataObject userData = Manager.create().prepare("SELECT * FROM user WHERE id = ? LIMIT 1", id).findOne();
+            if (userData == null) {
+                return null;
+            }
+
+            user = new User(userData);
         } catch (SQLException ex) {
             ex.printStackTrace(); //TODO: Good error handling!
         }
@@ -50,7 +64,12 @@ public class HeadUserManager implements IUserManager, IAuthenticationManager {
     public UserData getUserData(int id) {
         UserData data = null;
         try {
-            data = new UserData(Manager.create().prepare("SELECT * FROM user_data_personal WHERE user_id = ? LIMIT 1", id).findOne(), null);
+            DataObject userData = Manager.create().prepare("SELECT * FROM user_data_personal WHERE user_id = ? LIMIT 1", id).findOne();
+            if (userData == null) {
+                return null;
+            }
+
+            data = new UserData(userData, null);
         } catch (SQLException ex) {
             ex.printStackTrace();
         }
@@ -61,7 +80,12 @@ public class HeadUserManager implements IUserManager, IAuthenticationManager {
     public User getUser(String username) {
         User user = null;
         try {
-            user = new User(Manager.create().prepare("SELECT * FROM user WHERE username = ? LIMIT 1", username).findOne());
+            DataObject userData = Manager.create().prepare("SELECT * FROM user WHERE username = ? LIMIT 1", username).findOne();
+            if (userData == null) {
+                return null;
+            }
+
+            user = new User(userData);
         } catch (SQLException ex) {
             ex.printStackTrace(); //TODO: Good error handling!
         }
