@@ -38,8 +38,14 @@ public class MainManager implements IHeadController {
         this.userManager = new HeadUserManager(this);
         this.reservationManager = new ReservationManager(this);
         this.itemManager = new ItemManager(this);
-        this.viewManager = ViewManager.getInstance();
+        ViewManager.getInstance();
+    }
 
+    public void setViewManager(ViewManager viewManager) {
+        if (this.viewManager != null) {
+            throw new IllegalStateException("View Manager already initialized");
+        }
+        this.viewManager = viewManager;
     }
 
     @Override

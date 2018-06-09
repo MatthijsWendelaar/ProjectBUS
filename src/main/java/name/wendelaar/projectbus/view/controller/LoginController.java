@@ -5,6 +5,7 @@ import javafx.fxml.FXML;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import name.wendelaar.projectbus.database.concurrency.SimpleReceiveTask;
+import name.wendelaar.projectbus.database.models.User;
 import name.wendelaar.projectbus.main.LlsApi;
 import name.wendelaar.projectbus.database.manager.IAuthenticationManager;
 import name.wendelaar.projectbus.validator.InputValidator;
@@ -45,14 +46,19 @@ public class LoginController extends Controller {
             };
 
             authenticateTask.setOnSucceeded(wk -> {
+                User user;
                 try {
                     InputValidator.isTrue("The credentials did not match", authenticateTask.getValue());
+
+                    user = manager.getCurrentUser();
+
+                    InputValidator.isTrue("Your account is disabled, please contact a librarian if you think this is a mistake", !user.isAccountDisabled());
                 } catch (ValidatorException ex) {
                     return;
                 }
 
-                if (manager.getCurrentUser().isLiberian()) {
-                    viewManager.changeState(ViewState.INDEX_DEFAULT);//TODO: change this to LIBERIAN_DEFAULT
+                if (user.isLiberian()) {
+                    viewManager.changeState(ViewState.INDEX_LIBRARIAN);
                 } else {
                     viewManager.changeState(ViewState.INDEX_DEFAULT);
                 }

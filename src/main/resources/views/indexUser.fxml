@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.scene.text.*?>
 <?import java.lang.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
@@ -11,9 +12,29 @@
    <children>
       <Pane prefHeight="400.0" prefWidth="137.0" styleClass="root">
          <children>
-            <Button fx:id="loanedItemsButton" layoutY="56.0" mnemonicParsing="false" onAction="#onShowLoanedItems" prefHeight="25.0" prefWidth="137.0" styleClass="primary-button" text="Loaned Items" />
-            <Button fx:id="availableItemsButton" layoutY="92.0" mnemonicParsing="false" onAction="#onShowAvailableItems" prefHeight="25.0" prefWidth="137.0" styleClass="primary-bg" text="Available Items" />
-            <Button fx:id="reservedItemsButton" layoutY="135.0" mnemonicParsing="false" onAction="#onShowReservedItems" prefHeight="25.0" prefWidth="137.0" styleClass="primary-bg" text="Reserved Items" />
+            <Button fx:id="loanedItemsButton" layoutY="56.0" mnemonicParsing="false" onAction="#onShowLoanedItems" prefHeight="25.0" prefWidth="137.0" styleClass="primary-button" text="Loaned Items" textFill="WHITE">
+               <font>
+                  <Font name="Open Sans SemiBold" size="12.0" />
+               </font></Button>
+            <Button fx:id="availableItemsButton" layoutY="92.0" mnemonicParsing="false" onAction="#onShowAvailableItems" prefHeight="25.0" prefWidth="137.0" styleClass="primary-button" text="Available Items" textFill="WHITE">
+               <font>
+                  <Font name="Open Sans SemiBold" size="12.0" />
+               </font></Button>
+            <Button fx:id="reservedItemsButton" layoutY="129.0" mnemonicParsing="false" onAction="#onShowReservedItems" prefHeight="25.0" prefWidth="137.0" styleClass="primary-button" text="Reserved Items" textFill="WHITE">
+               <font>
+                  <Font name="Open Sans SemiBold" size="12.0" />
+               </font></Button>
+            <Text fill="WHITE" layoutX="39.0" layoutY="38.0" strokeType="OUTSIDE" strokeWidth="0.0" text="LLS" textAlignment="CENTER">
+               <font>
+                  <Font name="Open Sans SemiBold" size="36.0" />
+               </font>
+            </Text>
+            <Separator layoutY="45.0" prefHeight="0.0" prefWidth="137.0" style="-fx-background-color: white;" />
+            <Button fx:id="logoutButton" layoutY="361.0" mnemonicParsing="false" onAction="#onLogout" prefHeight="25.0" prefWidth="137.0" styleClass="primary-button" text="Logout" textFill="WHITE">
+               <font>
+                  <Font name="Open Sans SemiBold" size="12.0" />
+               </font>
+            </Button>
          </children>
       </Pane>
       <AnchorPane fx:id="showDataPane" layoutX="140.0" prefHeight="400.0" prefWidth="460.0" />

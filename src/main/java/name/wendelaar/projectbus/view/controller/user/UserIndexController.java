@@ -37,6 +37,8 @@ public class UserIndexController extends Controller {
     private Button availableItemsButton;
     @FXML
     private Button reservedItemsButton;
+    @FXML
+    private Button logoutButton;
 
     private Node lastClicked = null;
 
@@ -45,6 +47,11 @@ public class UserIndexController extends Controller {
     @Override
     public String getTitle() {
         return title;
+    }
+
+    @Override
+    public void setupAfterInitialization() {
+       onShowLoanedItems();
     }
 
     @FXML
@@ -289,6 +296,11 @@ public class UserIndexController extends Controller {
         lastClicked = reservedItemsButton;
 
 
+    }
+
+    @FXML
+    private void onLogout() {
+        LlsApi.getAuthManager().logout();
     }
 
     private BusAlert buildAlert(Map<String, Object> values) {

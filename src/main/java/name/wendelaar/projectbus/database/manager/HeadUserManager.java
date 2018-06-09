@@ -1,6 +1,7 @@
 package name.wendelaar.projectbus.database.manager;
 
 import name.wendelaar.projectbus.database.models.UserData;
+import name.wendelaar.projectbus.view.ViewState;
 import name.wendelaar.snowdb.data.DataObject;
 import name.wendelaar.snowdb.manager.Manager;
 import name.wendelaar.projectbus.database.models.User;
@@ -121,6 +122,12 @@ public class HeadUserManager implements IUserManager, IAuthenticationManager {
         currentUser = user;
 
         return true;
+    }
+
+    @Override
+    public void logout() {
+        currentUser = null;
+        mainManager.getViewManager().changeState(ViewState.LOGIN);
     }
 
     @Override

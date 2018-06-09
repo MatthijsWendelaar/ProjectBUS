@@ -25,4 +25,8 @@ public abstract class Controller {
         stage.setMaxWidth(MAX_WIDTH_SIZE);
         stage.setMaxHeight(MAX_HEIGHT_SIZE);
     }
+
+    public void setupAfterInitialization() {
+
+    }
 }

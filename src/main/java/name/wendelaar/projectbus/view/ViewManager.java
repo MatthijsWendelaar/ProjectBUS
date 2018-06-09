@@ -4,6 +4,7 @@ import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+import name.wendelaar.projectbus.database.concurrency.DatabaseThreadFactory;
 import name.wendelaar.projectbus.main.LlsApi;
 import name.wendelaar.projectbus.main.MainManager;
 import name.wendelaar.projectbus.main.IHeadController;
@@ -34,6 +35,7 @@ public class ViewManager extends Application implements IViewManager {
     public void start(Stage primaryStage) throws Exception {
         instance = this;
         this.mainManager = (MainManager) LlsApi.getController();
+        mainManager.setViewManager(this);
         this.stage = primaryStage;
         changeState(mainManager.getCurrentState());
         stage.setResizable(true);
@@ -74,6 +76,7 @@ public class ViewManager extends Application implements IViewManager {
             currentScene = new Scene(loader.getRoot());
             currentController = loader.getController();
             currentController.receiveViewManager(this);
+            currentController.setupAfterInitialization();
 
             stage.setTitle("LLS - " + currentController.getTitle());
             stage.setScene(currentScene);
