@@ -75,11 +75,11 @@ public class UserIndexController extends Controller {
             itemView.getItems().addAll(receiveItemsTask.getValue());
         });
 
-        service.submit(receiveItemsTask);
-
         itemView = new TableBuilder<Item, String>().addColumn("Name", "Name")
                 .addColumn("Type", "TypeName").addColumn("Date Loaned", "LoanedOutDate")
                 .addColumn("Too Late", "ToLateToString").getTableView();
+
+        service.submit(receiveItemsTask);
 
         itemView.setRowFactory(tv -> {
             TableRow<Item> row = new TableRow<>();
@@ -222,6 +222,8 @@ public class UserIndexController extends Controller {
             return;
         }
 
+        lastClicked = reservedItemsButton;
+
         ExecutorService service = LlsApi.getController().getExecutorService();
         IItemManager itemManager = LlsApi.getItemManager();
         User user = LlsApi.getAuthManager().getCurrentUser();
@@ -300,6 +302,11 @@ public class UserIndexController extends Controller {
 
     @FXML
     private void onLogout() {
+        if (logoutButton.equals(lastClicked)) {
+            return;
+        }
+        lastClicked = logoutButton;
+
         LlsApi.getAuthManager().logout();
     }
 

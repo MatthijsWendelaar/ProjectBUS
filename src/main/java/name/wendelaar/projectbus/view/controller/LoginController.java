@@ -57,7 +57,7 @@ public class LoginController extends Controller {
                     return;
                 }
 
-                if (user.isLiberian()) {
+                if (user.isLibrarian()) {
                     viewManager.changeState(ViewState.INDEX_LIBRARIAN);
                 } else {
                     viewManager.changeState(ViewState.INDEX_DEFAULT);

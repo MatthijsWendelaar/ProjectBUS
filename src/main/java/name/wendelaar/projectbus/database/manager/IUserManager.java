@@ -19,5 +19,7 @@ public interface IUserManager {
 
     public User getUser(String username);
 
+    public Collection<User> getUsersExceptOne(User user);
+
     public Collection<User> getUsers();
 }

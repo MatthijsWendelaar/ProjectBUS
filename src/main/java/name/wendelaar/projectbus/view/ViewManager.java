@@ -4,10 +4,9 @@ import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
-import name.wendelaar.projectbus.database.concurrency.DatabaseThreadFactory;
+import name.wendelaar.projectbus.main.IHeadController;
 import name.wendelaar.projectbus.main.LlsApi;
 import name.wendelaar.projectbus.main.MainManager;
-import name.wendelaar.projectbus.main.IHeadController;
 import name.wendelaar.projectbus.view.controller.Controller;
 
 import java.io.IOException;

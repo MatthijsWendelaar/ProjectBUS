@@ -3,7 +3,7 @@ package name.wendelaar.projectbus.view;
 public enum ViewState {
     LOGIN("login.fxml"),
     INDEX_DEFAULT("indexUser.fxml"),
-    INDEX_LIBRARIAN("indexLibrarian");
+    INDEX_LIBRARIAN("indexLibrarian.fxml");
 
     private String fileName;
 

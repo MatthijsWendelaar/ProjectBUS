@@ -90,6 +90,25 @@ public class HeadUserManager implements IUserManager, IAuthenticationManager {
     }
 
     @Override
+    public Collection<User> getUsersExceptOne(User user) {
+        int id;
+        if (user == null || (id = user.getId()) == 0) {
+            return getUsers();
+        }
+
+        List<User> users = new ArrayList<>();
+        try {
+            List<DataObject> dataObjects = Manager.create().prepare("SELECT * FROM user WHERE user.id <> ?", id).find();
+            for (DataObject dataObject : dataObjects) {
+                users.add(new User(dataObject));
+            }
+        } catch (SQLException ex) {
+            ex.printStackTrace(); //TODO: Good error handling!
+        }
+        return users;
+    }
+
+    @Override
     public Collection<User> getUsers() {
         List<User> users = new ArrayList<>();
         try {
