@@ -3,6 +3,7 @@ package name.wendelaar.projectbus.view;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
+import javafx.scene.image.Image;
 import javafx.stage.Stage;
 import name.wendelaar.projectbus.main.IHeadController;
 import name.wendelaar.projectbus.main.LlsApi;
@@ -36,6 +37,7 @@ public class ViewManager extends Application implements IViewManager {
         this.mainManager = (MainManager) LlsApi.getController();
         mainManager.setViewManager(this);
         this.stage = primaryStage;
+        stage.getIcons().add(new Image(getClass().getResourceAsStream("/images/LLSIcon.png")));
         changeState(mainManager.getCurrentState());
         stage.setResizable(true);
         stage.show();
@@ -77,7 +79,7 @@ public class ViewManager extends Application implements IViewManager {
             currentController.receiveViewManager(this);
             currentController.setupAfterInitialization();
 
-            stage.setTitle("LLS - " + currentController.getTitle());
+            stage.setTitle(currentController.getTitle() + " - LLS");
             stage.setScene(currentScene);
         } catch (IOException ex) {
             ex.printStackTrace(); //TODO: error handling!

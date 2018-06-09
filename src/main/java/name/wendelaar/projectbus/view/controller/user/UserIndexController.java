@@ -10,18 +10,18 @@ import javafx.scene.control.TableView;
 import javafx.scene.input.MouseButton;
 import javafx.scene.layout.AnchorPane;
 import name.wendelaar.projectbus.database.concurrency.SimpleReceiveTask;
+import name.wendelaar.projectbus.database.manager.IItemManager;
 import name.wendelaar.projectbus.database.models.Item;
 import name.wendelaar.projectbus.database.models.ItemAttribute;
 import name.wendelaar.projectbus.database.models.User;
 import name.wendelaar.projectbus.main.LlsApi;
-import name.wendelaar.projectbus.database.manager.IItemManager;
 import name.wendelaar.projectbus.util.ChainedLinkedHashMap;
+import name.wendelaar.projectbus.util.ShowDataAlertBuilder;
 import name.wendelaar.projectbus.view.controller.Controller;
 import name.wendelaar.projectbus.view.parts.BusAlert;
 import name.wendelaar.projectbus.view.parts.TableBuilder;
 
 import java.util.Collection;
-import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ExecutorService;
 
@@ -51,7 +51,7 @@ public class UserIndexController extends Controller {
 
     @Override
     public void setupAfterInitialization() {
-       onShowLoanedItems();
+        onShowLoanedItems();
     }
 
     @FXML
@@ -104,7 +104,7 @@ public class UserIndexController extends Controller {
                             map.add(attribute.getAttributeName() + ": ", attribute.getAttributeValue());
                         }
 
-                        BusAlert alert = buildAlert(map).addButton(new ButtonType("Return Item", ButtonData.LEFT));
+                        BusAlert alert = ShowDataAlertBuilder.buildAlert(map).addButton(new ButtonType("Return Item", ButtonData.LEFT));
 
                         Optional<ButtonType> buttonType = alert.showAndWait();
                         if (buttonType.isPresent() && buttonType.get().getButtonData().equals(ButtonData.LEFT)) {
@@ -179,7 +179,7 @@ public class UserIndexController extends Controller {
                         map.add(attribute.getAttributeName() + ": ", attribute.getAttributeValue());
                     }
 
-                    BusAlert alert = buildAlert(map);
+                    BusAlert alert = ShowDataAlertBuilder.buildAlert(map);
 
                     if (item.isLoanedOut()) {
                         alert.addButton(new ButtonType("Reserve", ButtonData.LEFT));
@@ -273,7 +273,7 @@ public class UserIndexController extends Controller {
                         map.add(attribute.getAttributeName() + ": ", attribute.getAttributeValue());
                     }
 
-                    BusAlert alert = buildAlert(map);
+                    BusAlert alert = ShowDataAlertBuilder.buildAlert(map);
                     alert.addButton(new ButtonType("Cancel Reservation", ButtonData.LEFT));
 
                     Optional<ButtonType> buttonType = alert.showAndWait();
@@ -308,17 +308,5 @@ public class UserIndexController extends Controller {
         lastClicked = logoutButton;
 
         LlsApi.getAuthManager().logout();
-    }
-
-    private BusAlert buildAlert(Map<String, Object> values) {
-        BusAlert busAlert = new BusAlert().addDefaultStyleSheet();
-        StringBuilder builder = new StringBuilder();
-
-        for (Map.Entry<String, Object> entry : values.entrySet()) {
-            builder.append(entry.getKey()).append(entry.getValue()).append("\n");
-        }
-
-        busAlert.setMessage(builder.toString());
-        return busAlert;
     }
 }

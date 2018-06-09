@@ -2,6 +2,7 @@ package name.wendelaar.projectbus.view.parts;
 
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
+import javafx.scene.image.Image;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 
@@ -39,6 +40,11 @@ public class BusAlert extends Alert {
 
     public BusAlert addButton(ButtonType type) {
         getDialogPane().getButtonTypes().add(type);
+        return this;
+    }
+
+    public BusAlert addIcon(Image image) {
+        ((Stage) getDialogPane().getScene().getWindow()).getIcons().add(image);
         return this;
     }
 }
