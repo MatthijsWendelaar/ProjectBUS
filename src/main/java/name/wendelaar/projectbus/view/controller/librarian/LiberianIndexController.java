@@ -1,6 +1,8 @@
-package name.wendelaar.projectbus.view.controller.liberian;
+package name.wendelaar.projectbus.view.controller.librarian;
 
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBar.ButtonData;
 import javafx.scene.control.ButtonType;
@@ -16,9 +18,11 @@ import name.wendelaar.projectbus.database.models.UserData;
 import name.wendelaar.projectbus.main.LlsApi;
 import name.wendelaar.projectbus.util.ShowDataAlertBuilder;
 import name.wendelaar.projectbus.view.controller.BasicController;
+import name.wendelaar.projectbus.view.form.Form;
 import name.wendelaar.projectbus.view.parts.BusAlert;
 import name.wendelaar.projectbus.view.parts.TableBuilder;
 
+import java.io.IOException;
 import java.util.Collection;
 import java.util.Optional;
 import java.util.concurrent.ExecutorService;
@@ -146,6 +150,22 @@ public class LiberianIndexController extends BasicController {
     private void onShowCreateUser() {
         if (isSelected(createUserButton)) {
             return;
+        }
+
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/views/forms/form.fxml"));
+            loader.load();
+            Form form = loader.getController();
+            form.setRoot(loader.getRoot());
+
+            Parent root = form.getRoot();
+            form.addInputField("Username", "user.username");
+            form.addInputField("Password", "user.password");
+
+            showDataPane.getChildren().clear();
+            showDataPane.getChildren().add(form.getRoot());
+        } catch (IOException ex) {
+            ex.printStackTrace();
         }
     }
 

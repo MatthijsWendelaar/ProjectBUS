@@ -1,0 +1,20 @@
+{
+    -fx-primary-color: #16b9ff;
+    -fx-primary-light-color: #3dc5ff;
+
+}
+
+/*.form-text {*/
+    /*-fx-text-fill: ;*/
+/*}*/
+
+.form-submit-button {
+    -fx-background-color: -fx-primary-color;
+    -fx-font-family: "Open Sans ExtraBold";
+    -fx-font-size: 12;
+    -fx-text-fill: white;
+}
+
+.form-submit-button:hover {
+    -fx-background-color: -fx-primary-light-color;
+}

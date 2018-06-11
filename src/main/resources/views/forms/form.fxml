@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.text.*?>
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<AnchorPane stylesheets="@form.css" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="name.wendelaar.projectbus.view.form.Form">
+   <children>
+      <VBox fx:id="verticalInputBodyBox" prefHeight="362.0" prefWidth="400.0" AnchorPane.bottomAnchor="38.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+         <padding>
+            <Insets left="50.0" right="50.0" />
+         </padding>
+      </VBox>
+      <Button fx:id="formSubmitButton" layoutX="89.0" layoutY="362.0" mnemonicParsing="false" onAction="#onFormSubmit" prefHeight="25.0" prefWidth="223.0" styleClass="form-submit-button" text="Submit" AnchorPane.bottomAnchor="13.0" AnchorPane.leftAnchor="80.0" AnchorPane.rightAnchor="80.0" />
+   </children>
+</AnchorPane>
