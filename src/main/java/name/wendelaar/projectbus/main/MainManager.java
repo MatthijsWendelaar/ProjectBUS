@@ -48,9 +48,13 @@ public class MainManager implements IHeadController {
         this.viewManager = viewManager;
     }
 
+    public ViewState getStartupState() {
+        return state;
+    }
+
     @Override
     public ViewState getCurrentState() {
-        return state;
+        return viewManager.getCurrentState();
     }
 
     @Override

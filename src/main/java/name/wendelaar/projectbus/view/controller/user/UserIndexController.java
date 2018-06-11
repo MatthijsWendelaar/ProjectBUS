@@ -1,7 +1,6 @@
 package name.wendelaar.projectbus.view.controller.user;
 
 import javafx.fxml.FXML;
-import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBar.ButtonData;
 import javafx.scene.control.ButtonType;
@@ -17,7 +16,7 @@ import name.wendelaar.projectbus.database.models.User;
 import name.wendelaar.projectbus.main.LlsApi;
 import name.wendelaar.projectbus.util.ChainedLinkedHashMap;
 import name.wendelaar.projectbus.util.ShowDataAlertBuilder;
-import name.wendelaar.projectbus.view.controller.Controller;
+import name.wendelaar.projectbus.view.controller.BasicController;
 import name.wendelaar.projectbus.view.parts.BusAlert;
 import name.wendelaar.projectbus.view.parts.TableBuilder;
 
@@ -25,7 +24,7 @@ import java.util.Collection;
 import java.util.Optional;
 import java.util.concurrent.ExecutorService;
 
-public class UserIndexController extends Controller {
+public class UserIndexController extends BasicController {
 
     private String title = "Dashboard";
 
@@ -39,8 +38,6 @@ public class UserIndexController extends Controller {
     private Button reservedItemsButton;
     @FXML
     private Button logoutButton;
-
-    private Node lastClicked = null;
 
     private TableView<Item> itemView;
 
@@ -56,10 +53,9 @@ public class UserIndexController extends Controller {
 
     @FXML
     private void onShowLoanedItems() {
-        if (loanedItemsButton.equals(lastClicked)) {
+        if (isSelected(loanedItemsButton)) {
             return;
         }
-        lastClicked = loanedItemsButton;
 
         ExecutorService service = LlsApi.getController().getExecutorService();
         IItemManager itemManager = LlsApi.getController().getItemManager();
@@ -126,11 +122,9 @@ public class UserIndexController extends Controller {
 
     @FXML
     private void onShowAvailableItems() {
-        if (availableItemsButton.equals(lastClicked)) {
+        if (isSelected(availableItemsButton)) {
             return;
         }
-
-        lastClicked = availableItemsButton;
 
         ExecutorService service = LlsApi.getController().getExecutorService();
         IItemManager itemManager = LlsApi.getItemManager();
@@ -218,11 +212,9 @@ public class UserIndexController extends Controller {
 
     @FXML
     private void onShowReservedItems() {
-        if (reservedItemsButton.equals(lastClicked)) {
+        if (isSelected(reservedItemsButton)) {
             return;
         }
-
-        lastClicked = reservedItemsButton;
 
         ExecutorService service = LlsApi.getController().getExecutorService();
         IItemManager itemManager = LlsApi.getItemManager();
@@ -294,18 +286,13 @@ public class UserIndexController extends Controller {
         });
 
         showDataPane.getChildren().add(itemView);
-
-        lastClicked = reservedItemsButton;
-
-
     }
 
     @FXML
     private void onLogout() {
-        if (logoutButton.equals(lastClicked)) {
+        if (isSelected(logoutButton)) {
             return;
         }
-        lastClicked = logoutButton;
 
         LlsApi.getAuthManager().logout();
     }

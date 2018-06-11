@@ -38,7 +38,7 @@ public class ViewManager extends Application implements IViewManager {
         mainManager.setViewManager(this);
         this.stage = primaryStage;
         stage.getIcons().add(new Image(getClass().getResourceAsStream("/images/LLSIcon.png")));
-        changeState(mainManager.getCurrentState());
+        changeState(mainManager.getStartupState());
         stage.setResizable(true);
         stage.show();
     }
@@ -55,6 +55,11 @@ public class ViewManager extends Application implements IViewManager {
     @Override
     public Stage getStage() {
         return stage;
+    }
+
+    @Override
+    public ViewState getCurrentState() {
+        return state;
     }
 
     @Override

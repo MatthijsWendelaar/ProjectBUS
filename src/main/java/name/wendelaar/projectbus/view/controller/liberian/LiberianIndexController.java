@@ -1,7 +1,6 @@
 package name.wendelaar.projectbus.view.controller.liberian;
 
 import javafx.fxml.FXML;
-import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBar.ButtonData;
 import javafx.scene.control.ButtonType;
@@ -16,7 +15,7 @@ import name.wendelaar.projectbus.database.models.User;
 import name.wendelaar.projectbus.database.models.UserData;
 import name.wendelaar.projectbus.main.LlsApi;
 import name.wendelaar.projectbus.util.ShowDataAlertBuilder;
-import name.wendelaar.projectbus.view.controller.Controller;
+import name.wendelaar.projectbus.view.controller.BasicController;
 import name.wendelaar.projectbus.view.parts.BusAlert;
 import name.wendelaar.projectbus.view.parts.TableBuilder;
 
@@ -24,7 +23,7 @@ import java.util.Collection;
 import java.util.Optional;
 import java.util.concurrent.ExecutorService;
 
-public class LiberianIndexController extends Controller {
+public class LiberianIndexController extends BasicController {
 
     private String title = "Dashboard";
 
@@ -34,8 +33,8 @@ public class LiberianIndexController extends Controller {
     private Button logoutButton;
     @FXML
     private Button showUsersButton;
-
-    private Node lastClicked = null;
+    @FXML
+    private Button createUserButton;
 
     private TableView tableView;
 
@@ -52,10 +51,9 @@ public class LiberianIndexController extends Controller {
 
     @FXML
     private void onShowUsers() {
-        if (showUsersButton.equals(lastClicked)) {
+        if (isSelected(showUsersButton)) {
             return;
         }
-        lastClicked = showUsersButton;
         Stage stage = viewManager.getStage();
         stage.setTitle("Users - " + stage.getTitle());
 
@@ -145,11 +143,17 @@ public class LiberianIndexController extends Controller {
     }
 
     @FXML
-    private void onLogout() {
-        if (logoutButton.equals(lastClicked)) {
+    private void onShowCreateUser() {
+        if (isSelected(createUserButton)) {
             return;
         }
-        lastClicked = logoutButton;
+    }
+
+    @FXML
+    private void onLogout() {
+        if (isSelected(logoutButton)) {
+            return;
+        }
 
         LlsApi.getAuthManager().logout();
     }

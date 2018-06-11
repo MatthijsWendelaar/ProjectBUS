@@ -10,5 +10,7 @@ public interface IViewManager {
 
     public Stage getStage();
 
+    public ViewState getCurrentState();
+
     public IHeadController getHeadController();
 }
