@@ -1,13 +1,8 @@
 package name.wendelaar.projectbus.view.controller.librarian;
 
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
-import javafx.scene.control.Button;
+import javafx.scene.control.*;
 import javafx.scene.control.ButtonBar.ButtonData;
-import javafx.scene.control.ButtonType;
-import javafx.scene.control.TableRow;
-import javafx.scene.control.TableView;
 import javafx.scene.input.MouseButton;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
@@ -19,12 +14,15 @@ import name.wendelaar.projectbus.main.LlsApi;
 import name.wendelaar.projectbus.util.ShowDataAlertBuilder;
 import name.wendelaar.projectbus.view.controller.BasicController;
 import name.wendelaar.projectbus.view.form.Form;
+import name.wendelaar.projectbus.view.form.FormBuilder;
+import name.wendelaar.projectbus.view.form.FormValidatorException;
 import name.wendelaar.projectbus.view.parts.BusAlert;
 import name.wendelaar.projectbus.view.parts.TableBuilder;
+import name.wendelaar.snowdb.data.DataObject;
+import name.wendelaar.snowdb.data.SingleDataObject;
+import name.wendelaar.snowdb.manager.Manager;
 
-import java.io.IOException;
-import java.util.Collection;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.ExecutorService;
 
 public class LiberianIndexController extends BasicController {
@@ -152,21 +150,61 @@ public class LiberianIndexController extends BasicController {
             return;
         }
 
-        try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/views/forms/form.fxml"));
-            loader.load();
-            Form form = loader.getController();
-            form.setRoot(loader.getRoot());
+        FormBuilder builder = new FormBuilder();
+        ExecutorService service = LlsApi.getController().getExecutorService();
 
-            Parent root = form.getRoot();
-            form.addInputField("Username", "user.username");
-            form.addInputField("Password", "user.password");
+        builder.addDefaultField("Username", "user.username");
+        builder.addDefaultField("Email", "user.email");
+        builder.addField("Password", "user.password", true);
+        builder.addDefaultField("First Name", "user_data_personal.first_name");
+        builder.addDefaultField("Last Name", "user_data_personal.last_name");
+        builder.addDefaultField("City", "user_data_personal.city");
+        builder.addDefaultField("Street", "user_data_personal.street");
+        builder.addDefaultField("Postal Code", "user_data_personal.postal_code");
+        builder.addDefaultField("Home Number", "user_data_personal.home_number");
 
-            showDataPane.getChildren().clear();
-            showDataPane.getChildren().add(form.getRoot());
-        } catch (IOException ex) {
-            ex.printStackTrace();
-        }
+        Form form = builder.build();
+        form.setValidator(map -> {
+            for (TextInputControl inputControl : map.values()) {
+                if (inputControl.getText().isEmpty()) {
+                    throw new FormValidatorException("All fields need to be filled");
+                }
+            }
+        });
+        form.setReceiver(map -> {
+            DataObject userObject = new SingleDataObject(new HashMap<>(), "user");
+            DataObject userDataObject = new SingleDataObject(new HashMap<>(), "user_data_personal");
+
+            for (Map.Entry<String, String> entry : map.entrySet()) {
+                String key = entry.getKey();
+                String value = entry.getValue();
+                if (key.startsWith("user_data")) {
+                    userDataObject.set(key, value);
+                } else {
+                    userObject.set(key, value);
+                }
+            }
+            SimpleReceiveTask<Void> saveTask = new SimpleReceiveTask<Void>() {
+                @Override
+                public Void execute() {
+                    Manager.saveDataObject(userObject);
+                    return null;
+                }
+            };
+
+            saveTask.setOnSucceeded(wk -> {
+                userDataObject.set("user_data_personal.user_id", userObject.get("user.id"));
+                userDataObject.set("user_data_personal.birth_date", new Date());
+                service.submit(() -> {
+                    Manager.saveDataObject(userDataObject);
+                });
+            });
+
+            service.submit(saveTask);
+        });
+
+        showDataPane.getChildren().clear();
+        showDataPane.getChildren().add(form.getRoot());
     }
 
     @FXML

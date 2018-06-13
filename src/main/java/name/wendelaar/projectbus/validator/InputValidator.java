@@ -25,6 +25,6 @@ public class InputValidator {
     }
 
     private static void showAlert(String message) {
-        new BusAlert().addDefaultStyleSheet().setMessage(message).showAndWait();
+        new BusAlert().addDefaultIcon().addDefaultStyleSheet().setMessage(message).showAndWait();
     }
 }

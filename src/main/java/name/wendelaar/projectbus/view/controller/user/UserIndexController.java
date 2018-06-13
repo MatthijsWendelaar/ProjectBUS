@@ -92,15 +92,15 @@ public class UserIndexController extends BasicController {
                     };
 
                     receiveAttributesTask.setOnSucceeded(t -> {
-                        ChainedLinkedHashMap<String, Object> map = new ChainedLinkedHashMap<>();
-                        map.add("Id: ", item.getId()).add("Name: ", item.getName()).add("Too Late: ", item.getToLateToString())
-                                .add("Type: ", item.getTypeName()).add("Date Loaned: ", item.getLoanedOutDate());
+                        ShowDataAlertBuilder alertBuilder = new ShowDataAlertBuilder().append("Id",  item.getId())
+                                .append("Name", item.getName()).append("Too Late", item.getToLateToString())
+                                .append("Type", item.getTypeName()).append("Date Loaned", item.getLoanedOutDate());
 
                         for (ItemAttribute attribute : receiveAttributesTask.getValue()) {
-                            map.add(attribute.getAttributeName() + ": ", attribute.getAttributeValue());
+                            alertBuilder.append(attribute.getAttributeName(), attribute.getAttributeValue());
                         }
 
-                        BusAlert alert = ShowDataAlertBuilder.buildAlert(map).addButton(new ButtonType("Return Item", ButtonData.LEFT));
+                        BusAlert alert = alertBuilder.buildAlert().addButton(new ButtonType("Return Item", ButtonData.LEFT));
 
                         Optional<ButtonType> buttonType = alert.showAndWait();
                         if (buttonType.isPresent() && buttonType.get().getButtonData().equals(ButtonData.LEFT)) {
@@ -164,16 +164,14 @@ public class UserIndexController extends BasicController {
 
                 receiveAttributesTask.setOnSucceeded(w -> {
 
-                    ChainedLinkedHashMap<String, Object> map = new ChainedLinkedHashMap<>();
-
-                    map.add("Id: ", item.getId()).add("Name: ", item.getName()).add("Type: ", item.getTypeName())
-                            .add("Loaned Out: ", item.getLoanedOutToString());
+                    ShowDataAlertBuilder alertBuilder = new ShowDataAlertBuilder().append("Id", item.getId()).append("Name", item.getName()).append("Type", item.getTypeName())
+                            .append("Loaned Out", item.getLoanedOutToString());
 
                     for (ItemAttribute attribute : receiveAttributesTask.getValue()) {
-                        map.add(attribute.getAttributeName() + ": ", attribute.getAttributeValue());
+                        alertBuilder.append(attribute.getAttributeName(), attribute.getAttributeName());
                     }
 
-                    BusAlert alert = ShowDataAlertBuilder.buildAlert(map);
+                    BusAlert alert = alertBuilder.buildAlert();
 
                     if (item.isLoanedOut()) {
                         alert.addButton(new ButtonType("Reserve", ButtonData.LEFT));
@@ -256,17 +254,14 @@ public class UserIndexController extends BasicController {
 
                 receiveAttributesTask.setOnSucceeded(w -> {
 
-                    ChainedLinkedHashMap<String, Object> map = new ChainedLinkedHashMap<>();
-
-                    map.add("Id: ", item.getId()).add("Name: ", item.getName()).add("Type: ", item.getTypeName())
-                            .add("Loaned Out: ", item.getLoanedOutToString());
+                    ShowDataAlertBuilder alertBuilder = new ShowDataAlertBuilder().append("Id", item.getId())
+                            .append("Name", item.getName()).append("Type", item.getTypeName()).append("Loaned Out",item.getLoanedOutToString());
 
                     for (ItemAttribute attribute : receiveAttributesTask.getValue()) {
-                        map.add(attribute.getAttributeName() + ": ", attribute.getAttributeValue());
+                        alertBuilder.append(attribute.getAttributeName(), attribute.getAttributeValue());
                     }
 
-                    BusAlert alert = ShowDataAlertBuilder.buildAlert(map);
-                    alert.addButton(new ButtonType("Cancel Reservation", ButtonData.LEFT));
+                    BusAlert alert = alertBuilder.buildAlert().addButton(new ButtonType("Cancel Reservation", ButtonData.LEFT));
 
                     Optional<ButtonType> buttonType = alert.showAndWait();
                     if (!buttonType.isPresent() || !buttonType.get().getButtonData().equals(ButtonData.LEFT)) {

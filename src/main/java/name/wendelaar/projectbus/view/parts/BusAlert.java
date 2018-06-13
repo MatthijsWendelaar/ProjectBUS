@@ -47,4 +47,9 @@ public class BusAlert extends Alert {
         ((Stage) getDialogPane().getScene().getWindow()).getIcons().add(image);
         return this;
     }
+
+    public BusAlert addDefaultIcon() {
+        ((Stage) getDialogPane().getScene().getWindow()).getIcons().add(new Image(getClass().getResourceAsStream("/images/LLSIcon.png")));
+        return this;
+    }
 }

@@ -21,16 +21,4 @@ public class ShowDataAlertBuilder {
     public BusAlert buildAlert() {
         return new BusAlert().addDefaultStyleSheet().addIcon(new Image(getClass().getResourceAsStream("/images/LLSIcon.png"))).setMessage(builder.toString());
     }
-
-    public static BusAlert buildAlert(Map<String, Object> values) {
-        BusAlert busAlert = new BusAlert().addDefaultStyleSheet();
-        StringBuilder builder = new StringBuilder();
-
-        for (Map.Entry<String, Object> entry : values.entrySet()) {
-            builder.append(entry.getKey()).append(entry.getValue()).append("\n");
-        }
-
-        busAlert.setMessage(builder.toString());
-        return busAlert;
-    }
 }

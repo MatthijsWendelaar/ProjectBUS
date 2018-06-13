@@ -1,13 +1,12 @@
 package name.wendelaar.projectbus.view.controller;
 
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import name.wendelaar.projectbus.database.concurrency.SimpleReceiveTask;
+import name.wendelaar.projectbus.database.manager.IAuthenticationManager;
 import name.wendelaar.projectbus.database.models.User;
 import name.wendelaar.projectbus.main.LlsApi;
-import name.wendelaar.projectbus.database.manager.IAuthenticationManager;
 import name.wendelaar.projectbus.validator.InputValidator;
 import name.wendelaar.projectbus.validator.ValidatorException;
 import name.wendelaar.projectbus.view.ViewState;
@@ -31,7 +30,8 @@ public class LoginController extends Controller {
         return this.title;
     }
 
-    public void tryLogin(ActionEvent event) {
+    @FXML
+    private void tryLogin() {
         String username = usernameInput.getText();
         String password = passwordInput.getText();
         try {
