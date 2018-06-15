@@ -11,7 +11,7 @@ public class TableBuilder<T, S> {
     public TableBuilder() {
         tableView = new TableView<>();
         tableView.setEditable(false);
-        tableView.setPrefWidth(500);
+        //tableView.setPrefWidth(500);
     }
 
     public TableBuilder addColumn(String columnName, String propertyName) {

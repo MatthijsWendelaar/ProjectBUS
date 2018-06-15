@@ -1,11 +1,12 @@
 package name.wendelaar.projectbus.database.manager;
 
+import name.wendelaar.projectbus.database.models.User;
 import name.wendelaar.projectbus.database.models.UserData;
+import name.wendelaar.projectbus.main.MainManager;
 import name.wendelaar.projectbus.view.ViewState;
 import name.wendelaar.snowdb.data.DataObject;
 import name.wendelaar.snowdb.manager.Manager;
-import name.wendelaar.projectbus.database.models.User;
-import name.wendelaar.projectbus.main.MainManager;
+import org.mindrot.jbcrypt.BCrypt;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -22,8 +23,23 @@ public class HeadUserManager implements IUserManager, IAuthenticationManager {
     }
 
     @Override
-    public void createUser(User user) {
-        //TODO: add implementation
+    public void createUser(DataObject userObject, DataObject userDataObject) {
+        if (userObject == null) {
+            return;
+        }
+
+        Object plainPassword = userObject.get("user.password");
+        userObject.set("user.password", BCrypt.hashpw(plainPassword.toString(), BCrypt.gensalt()));
+
+        Manager.saveDataObject(userObject);
+
+        if (userDataObject == null) {
+            return;
+        }
+
+        userDataObject.set("user_data_personal.user_id", userObject.get("user.id"));
+
+        Manager.saveDataObject(userDataObject);
     }
 
     @Override

@@ -93,7 +93,7 @@ public class ItemManager implements IItemManager {
 
     @Override
     public Collection<Item> getItems() {
-        return null;
+        return requestItems("SELECT * FROM item INNER JOIN item_type ON item.item_type_id = item_type.id");
     }
 
     @Override

@@ -3,6 +3,7 @@ package name.wendelaar.projectbus.database.models;
 import name.wendelaar.projectbus.util.BooleanToStringConverter;
 import name.wendelaar.snowdb.data.DataObject;
 import name.wendelaar.snowdb.data.model.Model;
+import org.mindrot.jbcrypt.BCrypt;
 
 public class User extends Model {
 
@@ -31,13 +32,12 @@ public class User extends Model {
     }
 
     public boolean hasSamePassword(String password) {
-        //TODO: add hashing!
         Object object = dataObject.get("password");
         if (object == null) {
             return false;
         }
 
-        return object.equals(password);
+        return BCrypt.checkpw(password, object.toString());
     }
 
     public void setAccountDisabled(boolean disabled) {
@@ -50,10 +50,5 @@ public class User extends Model {
 
     public String isAccountDisabledToString() {
         return BooleanToStringConverter.convert(dataObject.get("disabled"));
-    }
-    public void printAll() {
-        for (Object o : dataObject.getAll()) {
-            System.out.println(o);
-        }
     }
 }

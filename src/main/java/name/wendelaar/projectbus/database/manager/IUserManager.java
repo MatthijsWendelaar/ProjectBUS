@@ -2,12 +2,13 @@ package name.wendelaar.projectbus.database.manager;
 
 import name.wendelaar.projectbus.database.models.User;
 import name.wendelaar.projectbus.database.models.UserData;
+import name.wendelaar.snowdb.data.DataObject;
 
 import java.util.Collection;
 
 public interface IUserManager {
 
-    public void createUser(User user);
+    public void createUser(DataObject userObject, DataObject userDataObject);
 
     public void deleteUser(User user);
 

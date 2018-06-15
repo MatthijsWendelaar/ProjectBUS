@@ -1,36 +1,45 @@
 package name.wendelaar.projectbus.view.form;
 
 import javafx.fxml.FXML;
+import javafx.geometry.Insets;
+import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.control.Button;
-import javafx.scene.control.PasswordField;
-import javafx.scene.control.TextField;
-import javafx.scene.control.TextInputControl;
+import javafx.scene.control.ScrollPane;
+import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
+import name.wendelaar.projectbus.view.form.fields.FormField;
+import name.wendelaar.projectbus.view.form.validator.IFormValidator;
 import name.wendelaar.projectbus.view.parts.BusAlert;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class Form {
-
-    private Parent root;
-    private IFormReceiver receiver;
-    private IFormValidator validator;
 
     @FXML
     private Button formSubmitButton;
 
     @FXML
+    private ScrollPane scrollPane;
+
+    @FXML
     private VBox verticalInputBodyBox;
 
-    private Map<String, TextInputControl> inputMap = new HashMap<>();
+    private Parent root;
+    private IFormReceiver receiver;
+
+    private List<IFormValidator> validators = new ArrayList<>();
+
+    private Map<String, FormField> inputMap = new HashMap<>();
 
     @FXML
     private void onFormSubmit() {
         try {
-            if (validator != null) {
+            for (IFormValidator validator : validators) {
                 validator.validate(inputMap);
             }
         } catch (FormValidatorException ex) {
@@ -42,18 +51,26 @@ public class Form {
             return;
         }
 
-        Map<String, String> data = new HashMap<>();
-        for (Map.Entry<String, TextInputControl> entry : inputMap.entrySet()) {
-            data.put(entry.getKey(), entry.getValue().getText());
+        Map<String, Object> data = new HashMap<>();
+        for (Map.Entry<String, FormField> entry : inputMap.entrySet()) {
+            data.put(entry.getKey(), entry.getValue().getInput());
         }
 
         receiver.receive(data);
+    }
 
-        debugPrint();
+    private void initialize() {
+        scrollPane.widthProperty().addListener((observable, oldValue, newValue) -> {
+            verticalInputBodyBox.setPrefWidth(newValue.doubleValue() - 20);
+        });
+        scrollPane.heightProperty().addListener((observable, oldValue, newValue) -> {
+            verticalInputBodyBox.setPrefHeight(newValue.doubleValue() - 10);
+        });
     }
 
     public void setRoot(Parent root) {
         this.root = root;
+        initialize();
     }
 
     public Parent getRoot() {
@@ -64,46 +81,35 @@ public class Form {
         this.receiver = receiver;
     }
 
-    public IFormReceiver getReceiver() {
-        return receiver;
+    public void addValidator(IFormValidator validator) {
+        if (!validators.contains(validator)) {
+            validators.add(validator);
+        }
     }
 
-    public void setValidator(IFormValidator validator) {
-        this.validator = validator;
+    public void clearForm() {
+        for (FormField formField : inputMap.values()) {
+            formField.clear();
+        }
     }
 
-    public IFormValidator getValidator() {
-        return validator;
-    }
-
-    public void addInputField(String text, String inputKey) {
-        if (inputKey == null || inputMap.containsKey(inputKey)) {
+    public void addField(String text, String key, FormField formField) {
+        if (key == null || key.isEmpty() || inputMap.containsKey(key)) {
             return;
         }
 
-        Text inputDisplayText = new Text(text == null ? inputKey : text + ":");
+        Text inputDisplayText = new Text(text == null ? key : text + ":");
 
-        addField(inputDisplayText, inputKey, new TextField());
+        inputMap.put(key, formField);
+
+        addMargin(inputDisplayText);
+        addMargin(formField.getControl());
+
+        verticalInputBodyBox.getChildren().addAll(inputDisplayText, formField.getControl());
     }
 
-    public void addSecretField(String text, String inputKey) {
-        if (inputKey == null || inputMap.containsKey(inputKey)) {
-            return;
-        }
-        Text inputDisplayText = new Text(text == null ? inputKey : text + ":");
-
-        addField(inputDisplayText, inputKey, new PasswordField());
-    }
-
-    private void addField(Text text, String key, TextInputControl textInput) {
-        inputMap.put(key, textInput);
-        verticalInputBodyBox.getChildren().addAll(text, textInput);
-    }
-
-    public void debugPrint() {
-        for (Map.Entry<String, TextInputControl> entry : inputMap.entrySet()) {
-            System.out.println("Data Key: " + entry.getKey());
-            System.out.println("Value: " + entry.getValue().getText());
-        }
+    private void addMargin(Node node) {
+        VBox.setMargin(node, new Insets(3, 0, 6, 0));
+        VBox.setVgrow(node, Priority.ALWAYS);
     }
 }

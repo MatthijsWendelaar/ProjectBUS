@@ -1,13 +1,19 @@
 package name.wendelaar.projectbus.view.controller.librarian;
 
+import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
-import javafx.scene.control.*;
+import javafx.scene.Node;
+import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBar.ButtonData;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.TableRow;
+import javafx.scene.control.TableView;
 import javafx.scene.input.MouseButton;
 import javafx.scene.layout.AnchorPane;
-import javafx.stage.Stage;
 import name.wendelaar.projectbus.database.concurrency.SimpleReceiveTask;
+import name.wendelaar.projectbus.database.manager.IItemManager;
 import name.wendelaar.projectbus.database.manager.IUserManager;
+import name.wendelaar.projectbus.database.models.Item;
 import name.wendelaar.projectbus.database.models.User;
 import name.wendelaar.projectbus.database.models.UserData;
 import name.wendelaar.projectbus.main.LlsApi;
@@ -15,14 +21,17 @@ import name.wendelaar.projectbus.util.ShowDataAlertBuilder;
 import name.wendelaar.projectbus.view.controller.BasicController;
 import name.wendelaar.projectbus.view.form.Form;
 import name.wendelaar.projectbus.view.form.FormBuilder;
-import name.wendelaar.projectbus.view.form.FormValidatorException;
+import name.wendelaar.projectbus.view.form.fields.FormComboBox;
+import name.wendelaar.projectbus.view.form.validator.AllFilledValidator;
 import name.wendelaar.projectbus.view.parts.BusAlert;
 import name.wendelaar.projectbus.view.parts.TableBuilder;
 import name.wendelaar.snowdb.data.DataObject;
 import name.wendelaar.snowdb.data.SingleDataObject;
-import name.wendelaar.snowdb.manager.Manager;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.ExecutorService;
 
 public class LiberianIndexController extends BasicController {
@@ -37,11 +46,13 @@ public class LiberianIndexController extends BasicController {
     private Button showUsersButton;
     @FXML
     private Button createUserButton;
+    @FXML
+    private Button showItemsButton;
 
     private TableView tableView;
 
     public LiberianIndexController() {
-        MAX_HEIGHT_SIZE = 450;
+        MAX_HEIGHT_SIZE = 430;
         MIN_HEIGHT_SIZE = 430;
         MAX_WIDTH_SIZE = 700;
     }
@@ -51,13 +62,17 @@ public class LiberianIndexController extends BasicController {
         return title;
     }
 
+    @Override
+    public void setupAfterInitialization() {
+        System.out.println("watt");
+        //addConstraints(showDataPane);
+    }
+
     @FXML
     private void onShowUsers() {
         if (isSelected(showUsersButton)) {
             return;
         }
-        Stage stage = viewManager.getStage();
-        stage.setTitle("Users - " + stage.getTitle());
 
         ExecutorService service = LlsApi.getController().getExecutorService();
         IUserManager userManager = LlsApi.getUserManager();
@@ -96,11 +111,11 @@ public class LiberianIndexController extends BasicController {
                 receiveUserDataPersonalTask.setOnSucceeded(t -> {
                     UserData userData = receiveUserDataPersonalTask.getValue();
 
-                    BusAlert alert = new ShowDataAlertBuilder().append("Id", user.getId()).append("First Name", userData.getFirstName())
-                            .append("Last Name", userData.getLastName()).append("Email", user.getEmail())
+                    BusAlert alert = new ShowDataAlertBuilder().append("UUID", user.getId()).append("Username", user.getUserName())
+                            .append("First Name", userData.getFirstName()).append("Last Name", userData.getLastName()).append("Email", user.getEmail())
                             .append("Librarian", user.isLibrarianToString()).append("Account Disabled", user.isAccountDisabledToString())
                             .append("City", userData.getCity()).append("Postal Code", userData.getPostalCode())
-                            .append("Street", userData.getStreet()).append("Home Number", userData.getHomeNumber()).buildAlert();
+                            .append("Address", userData.getStreet() + " " + userData.getHomeNumber()).buildAlert();
 
                     if (!user.isLibrarian()) {
                         alert.addButton(new ButtonType("Delete User", ButtonData.LEFT));
@@ -138,10 +153,10 @@ public class LiberianIndexController extends BasicController {
             return row;
         });
 
-
         service.submit(receiveUsersTask);
 
-        showDataPane.getChildren().add(tableView);
+        addAndClear(tableView);
+        addConstraints(tableView);
     }
 
     @FXML
@@ -153,58 +168,86 @@ public class LiberianIndexController extends BasicController {
         FormBuilder builder = new FormBuilder();
         ExecutorService service = LlsApi.getController().getExecutorService();
 
-        builder.addDefaultField("Username", "user.username");
-        builder.addDefaultField("Email", "user.email");
-        builder.addField("Password", "user.password", true);
-        builder.addDefaultField("First Name", "user_data_personal.first_name");
-        builder.addDefaultField("Last Name", "user_data_personal.last_name");
-        builder.addDefaultField("City", "user_data_personal.city");
-        builder.addDefaultField("Street", "user_data_personal.street");
-        builder.addDefaultField("Postal Code", "user_data_personal.postal_code");
-        builder.addDefaultField("Home Number", "user_data_personal.home_number");
+        HashMap<String, Object> comboBoxMap = new HashMap<String, Object>() {
+            {
+                put("Librarian", 1);
+                put("Default User", 0);
+            }
+        };
+        FormComboBox<String> formComboBox = new FormComboBox<>(comboBoxMap);
+
+        builder.addTextField("Username", "user.username").addTextField("Email", "user.email").addPasswordField("Password", "user.password")
+                .addTextField("First Name", "user_data_personal.first_name").addTextField("Last Name", "user_data_personal.last_name")
+                .addComboBox("Role", "user.rank", formComboBox).addDateField("Birth Date", "user_data_personal.birth_date")
+                .addTextField("City", "user_data_personal.city").addTextField("Street", "user_data_personal.street")
+                .addTextField("Postal Code", "user_data_personal.postal_code").addTextField("Home Number", "user_data_personal.home_number")
+                .addValidator(new AllFilledValidator());
 
         Form form = builder.build();
-        form.setValidator(map -> {
-            for (TextInputControl inputControl : map.values()) {
-                if (inputControl.getText().isEmpty()) {
-                    throw new FormValidatorException("All fields need to be filled");
-                }
-            }
-        });
+
         form.setReceiver(map -> {
             DataObject userObject = new SingleDataObject(new HashMap<>(), "user");
             DataObject userDataObject = new SingleDataObject(new HashMap<>(), "user_data_personal");
 
-            for (Map.Entry<String, String> entry : map.entrySet()) {
+            for (Map.Entry<String, Object> entry : map.entrySet()) {
                 String key = entry.getKey();
-                String value = entry.getValue();
+                String value = entry.getValue().toString();
                 if (key.startsWith("user_data")) {
                     userDataObject.set(key, value);
                 } else {
                     userObject.set(key, value);
                 }
             }
-            SimpleReceiveTask<Void> saveTask = new SimpleReceiveTask<Void>() {
+            SimpleReceiveTask<Void> saveUserTask = new SimpleReceiveTask<Void>() {
                 @Override
                 public Void execute() {
-                    Manager.saveDataObject(userObject);
+                    LlsApi.getUserManager().createUser(userObject, userDataObject);
                     return null;
                 }
             };
 
-            saveTask.setOnSucceeded(wk -> {
-                userDataObject.set("user_data_personal.user_id", userObject.get("user.id"));
-                userDataObject.set("user_data_personal.birth_date", new Date());
-                service.submit(() -> {
-                    Manager.saveDataObject(userDataObject);
-                });
+            saveUserTask.setOnSucceeded(wk -> {
+                new BusAlert().addDefaultIcon().addDefaultStyleSheet().setMessage("The user was successfully added!").showAndWait();
+                form.clearForm();
             });
 
-            service.submit(saveTask);
+            service.submit(saveUserTask);
         });
 
-        showDataPane.getChildren().clear();
-        showDataPane.getChildren().add(form.getRoot());
+
+        addAndClear(form.getRoot());
+        addConstraints(form.getRoot());
+    }
+
+    @FXML
+    private void onShowItems() {
+        if (isSelected(showItemsButton)) {
+            return;
+        }
+
+        ExecutorService service = LlsApi.getController().getExecutorService();
+        IItemManager itemManager = LlsApi.getItemManager();
+
+        SimpleReceiveTask<Collection<Item>> receiveItemsTask = new SimpleReceiveTask<Collection<Item>>() {
+            @Override
+            public Collection<Item> execute() {
+                return itemManager.getItems();
+            }
+        };
+
+        receiveItemsTask.setOnSucceeded(w -> {
+            tableView.getItems().addAll(receiveItemsTask.getValue());
+        });
+
+        service.submit(receiveItemsTask);
+
+        tableView = new TableBuilder<Item, String>().addColumn("Name", "Name")
+                .addColumn("Type", "TypeName").addColumn("Loaned Out", "LoanedOutToString")
+                .addColumn("Loaned Out At", "LoanedOutDate")
+                .getTableView();
+
+        addAndClear(tableView);
+        addConstraints(tableView);
     }
 
     @FXML
@@ -214,5 +257,22 @@ public class LiberianIndexController extends BasicController {
         }
 
         LlsApi.getAuthManager().logout();
+    }
+
+    private void addAndClear(Node node) {
+        ObservableList<Node> items = showDataPane.getChildren();
+        items.clear();
+        items.add(node);
+    }
+
+    private void addConstraints(Node node) {
+        if (node == null) {
+            return;
+        }
+
+        AnchorPane.setBottomAnchor(node, 0.0);
+        AnchorPane.setLeftAnchor(node, 0.0);
+        AnchorPane.setRightAnchor(node, 0.0);
+        AnchorPane.setTopAnchor(node, 0.0);
     }
 }
