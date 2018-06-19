@@ -1,9 +1,6 @@
 package name.wendelaar.projectbus.main;
 
-import name.wendelaar.projectbus.database.manager.IAuthenticationManager;
-import name.wendelaar.projectbus.database.manager.IItemManager;
-import name.wendelaar.projectbus.database.manager.IReservationManager;
-import name.wendelaar.projectbus.database.manager.IUserManager;
+import name.wendelaar.projectbus.database.manager.*;
 import name.wendelaar.projectbus.view.IViewManager;
 
 public class LlsApi {
@@ -37,6 +34,10 @@ public class LlsApi {
 
     public static IItemManager getItemManager() {
         return controller.getItemManager();
+    }
+
+    public static IItemAttributeManager getItemAttributeManager() {
+        return controller.getItemAttributeManager();
     }
 
     public static IReservationManager getReservationManager() {

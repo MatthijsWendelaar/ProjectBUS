@@ -1,19 +1,17 @@
-package name.wendelaar.projectbus.util;
+package name.wendelaar.projectbus.view.util;
 
 import javafx.scene.image.Image;
 import name.wendelaar.projectbus.view.parts.BusAlert;
 
-import java.util.Map;
-
-public class ShowDataAlertBuilder {
+public class InfoAlertBuilder {
 
     private StringBuilder builder;
 
-    public ShowDataAlertBuilder() {
+    public InfoAlertBuilder() {
         builder = new StringBuilder();
     }
 
-    public ShowDataAlertBuilder append(String key, Object value) {
+    public InfoAlertBuilder appendLine(String key, Object value) {
         builder.append(key).append(": ").append(value).append("\n");
         return this;
     }

@@ -24,8 +24,14 @@ public class ItemManager implements IItemManager {
     }
 
     @Override
-    public void addItem(String itemName, ItemType type) {
+    public void addItem(DataObject item, Collection<DataObject> attributes) {
+        Manager.saveDataObject(item);
 
+        int id = (int) item.get("id");
+        for (DataObject attributeObject : attributes) {
+            attributeObject.set("item_attribute_values.item_id", id);
+            Manager.saveDataObject(attributeObject);
+        }
     }
 
     @Override
@@ -70,30 +76,27 @@ public class ItemManager implements IItemManager {
         return requestItems("SELECT item.*, item_type.* FROM item INNER JOIN item_type ON item.item_type_id = item_type.id WHERE item.id NOT IN( SELECT reservation.item_id FROM reservation WHERE reservation.user_id = ?) AND item.user_id <> ? OR item.user_id IS NULL", user.getId(), user.getId());
     }
 
-    @Override
-    public Collection<ItemAttribute> getAttributesOfItem(Item item) {
-        List<ItemAttribute> itemAttributes = new ArrayList<>();
-        if (item == null || item.getId() == 0){
-            return itemAttributes;
-        }
-
-        try {
-            List<DataObject> dataObjects = Manager.create().prepare("SELECT * FROM item_attribute_values INNER JOIN item_type_attribute ON item_attribute_values.item_type_attribute_id = item_type_attribute.id INNER JOIN attribute ON item_type_attribute.attribute_id = attribute.id WHERE item_attribute_values.item_id = ?")
-                    .setValue(item.getId())
-                    .find();
-            for (DataObject dataObject : dataObjects) {
-                itemAttributes.add(new ItemAttribute((DataObjectCollection) dataObject));
-            }
-        } catch (SQLException ex) {
-            ex.printStackTrace();
-            return itemAttributes;
-        }
-        return itemAttributes;
-    }
 
     @Override
     public Collection<Item> getItems() {
         return requestItems("SELECT * FROM item INNER JOIN item_type ON item.item_type_id = item_type.id");
+    }
+
+    @Override
+    public Collection<ItemType> getItemTypes() {
+        List<ItemType> itemTypes = new ArrayList<>();
+
+        try {
+             List<DataObject> dataObjects = Manager.create().prepare("SELECT * FROM item_type").find();
+
+             for (DataObject dataObject : dataObjects) {
+                 itemTypes.add(new ItemType(dataObject));
+             }
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
+
+        return itemTypes;
     }
 
     @Override

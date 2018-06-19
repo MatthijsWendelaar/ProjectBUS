@@ -20,6 +20,7 @@ public class MainManager implements IHeadController {
     private HeadUserManager userManager;
     private IReservationManager reservationManager;
     private IItemManager itemManager;
+    private IItemAttributeManager itemAttributeManager;
 
     //View related fields
     private ViewState state;
@@ -30,6 +31,7 @@ public class MainManager implements IHeadController {
             SnowDB.getInstance().initialize();
         } catch (SnowDBException ex) {
             ex.printStackTrace();
+            System.exit(-1);
         }
         executorService = Executors.newFixedThreadPool(5, new DatabaseThreadFactory("DB_Thread_"));
 
@@ -38,6 +40,7 @@ public class MainManager implements IHeadController {
         this.userManager = new HeadUserManager(this);
         this.reservationManager = new ReservationManager(this);
         this.itemManager = new ItemManager(this);
+        this.itemAttributeManager = new ItemAttributeManager();
         ViewManager.getInstance();
     }
 
@@ -80,6 +83,11 @@ public class MainManager implements IHeadController {
     @Override
     public IViewManager getViewManager() {
         return viewManager;
+    }
+
+    @Override
+    public IItemAttributeManager getItemAttributeManager() {
+        return itemAttributeManager;
     }
 
     @Override

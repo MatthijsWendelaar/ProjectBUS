@@ -1,7 +1,9 @@
 package name.wendelaar.projectbus.database.manager;
 
+import name.wendelaar.projectbus.database.models.Item;
 import name.wendelaar.projectbus.database.models.User;
 import name.wendelaar.projectbus.database.models.UserData;
+import name.wendelaar.projectbus.main.LlsApi;
 import name.wendelaar.projectbus.main.MainManager;
 import name.wendelaar.projectbus.view.ViewState;
 import name.wendelaar.snowdb.data.DataObject;
@@ -46,6 +48,12 @@ public class HeadUserManager implements IUserManager, IAuthenticationManager {
     public void deleteUser(User user) {
         if (user == null) {
             return;
+        }
+
+        IItemManager itemManager = LlsApi.getItemManager();
+        Collection<Item> items = itemManager.getItemsOfUser(user);
+        for (Item item : items) {
+            itemManager.returnItem(item);
         }
 
         Manager.deleteModel(user);

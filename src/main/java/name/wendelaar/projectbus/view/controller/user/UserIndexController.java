@@ -14,19 +14,21 @@ import name.wendelaar.projectbus.database.models.Item;
 import name.wendelaar.projectbus.database.models.ItemAttribute;
 import name.wendelaar.projectbus.database.models.User;
 import name.wendelaar.projectbus.main.LlsApi;
-import name.wendelaar.projectbus.util.ChainedLinkedHashMap;
-import name.wendelaar.projectbus.util.ShowDataAlertBuilder;
-import name.wendelaar.projectbus.view.controller.BasicController;
+import name.wendelaar.projectbus.view.util.InfoAlertBuilder;
+import name.wendelaar.projectbus.view.controller.AbstractDashboardController;
 import name.wendelaar.projectbus.view.parts.BusAlert;
 import name.wendelaar.projectbus.view.parts.TableBuilder;
+import name.wendelaar.projectbus.view.util.PaneHelper;
+import name.wendelaar.projectbus.view.util.ViewUtil;
 
 import java.util.Collection;
 import java.util.Optional;
 import java.util.concurrent.ExecutorService;
 
-public class UserIndexController extends BasicController {
+public class UserIndexController extends AbstractDashboardController {
 
     private String title = "Dashboard";
+    private PaneHelper helper;
 
     @FXML
     private AnchorPane showDataPane;
@@ -48,6 +50,7 @@ public class UserIndexController extends BasicController {
 
     @Override
     public void setupAfterInitialization() {
+        helper = new PaneHelper(showDataPane);
         onShowLoanedItems();
     }
 
@@ -87,17 +90,17 @@ public class UserIndexController extends BasicController {
 
                         @Override
                         public Collection<ItemAttribute> execute() {
-                            return itemManager.getAttributesOfItem(item);
+                            return LlsApi.getItemAttributeManager().getAttributesOfItem(item);
                         }
                     };
 
                     receiveAttributesTask.setOnSucceeded(t -> {
-                        ShowDataAlertBuilder alertBuilder = new ShowDataAlertBuilder().append("Id",  item.getId())
-                                .append("Name", item.getName()).append("Too Late", item.getToLateToString())
-                                .append("Type", item.getTypeName()).append("Date Loaned", item.getLoanedOutDate());
+                        InfoAlertBuilder alertBuilder = new InfoAlertBuilder().appendLine("Id",  item.getId())
+                                .appendLine("Name", item.getName()).appendLine("Too Late", item.getToLateToString())
+                                .appendLine("Type", item.getTypeName()).appendLine("Date Loaned", item.getLoanedOutDate());
 
                         for (ItemAttribute attribute : receiveAttributesTask.getValue()) {
-                            alertBuilder.append(attribute.getAttributeName(), attribute.getAttributeValue());
+                            alertBuilder.appendLine(attribute.getAttributeName(), attribute.getAttributeValue());
                         }
 
                         BusAlert alert = alertBuilder.buildAlert().addButton(new ButtonType("Return Item", ButtonData.LEFT));
@@ -117,7 +120,7 @@ public class UserIndexController extends BasicController {
             return row;
         });
 
-        showDataPane.getChildren().add(itemView);
+        addTableToView();
     }
 
     @FXML
@@ -158,17 +161,17 @@ public class UserIndexController extends BasicController {
                 SimpleReceiveTask<Collection<ItemAttribute>> receiveAttributesTask = new SimpleReceiveTask<Collection<ItemAttribute>>() {
                     @Override
                     public Collection<ItemAttribute> execute() {
-                        return itemManager.getAttributesOfItem(item);
+                        return LlsApi.getItemAttributeManager().getAttributesOfItem(item);
                     }
                 };
 
                 receiveAttributesTask.setOnSucceeded(w -> {
 
-                    ShowDataAlertBuilder alertBuilder = new ShowDataAlertBuilder().append("Id", item.getId()).append("Name", item.getName()).append("Type", item.getTypeName())
-                            .append("Loaned Out", item.getLoanedOutToString());
+                    InfoAlertBuilder alertBuilder = new InfoAlertBuilder().appendLine("Id", item.getId()).appendLine("Name", item.getName()).appendLine("Type", item.getTypeName())
+                            .appendLine("Loaned Out", item.getLoanedOutToString());
 
                     for (ItemAttribute attribute : receiveAttributesTask.getValue()) {
-                        alertBuilder.append(attribute.getAttributeName(), attribute.getAttributeName());
+                        alertBuilder.appendLine(attribute.getAttributeName(), attribute.getAttributeName());
                     }
 
                     BusAlert alert = alertBuilder.buildAlert();
@@ -205,7 +208,7 @@ public class UserIndexController extends BasicController {
             return itemTableRow;
         });
 
-        showDataPane.getChildren().add(itemView);
+        addTableToView();
     }
 
     @FXML
@@ -248,17 +251,17 @@ public class UserIndexController extends BasicController {
                 SimpleReceiveTask<Collection<ItemAttribute>> receiveAttributesTask = new SimpleReceiveTask<Collection<ItemAttribute>>() {
                     @Override
                     public Collection<ItemAttribute> execute() {
-                        return itemManager.getAttributesOfItem(item);
+                        return LlsApi.getItemAttributeManager().getAttributesOfItem(item);
                     }
                 };
 
                 receiveAttributesTask.setOnSucceeded(w -> {
 
-                    ShowDataAlertBuilder alertBuilder = new ShowDataAlertBuilder().append("Id", item.getId())
-                            .append("Name", item.getName()).append("Type", item.getTypeName()).append("Loaned Out",item.getLoanedOutToString());
+                    InfoAlertBuilder alertBuilder = new InfoAlertBuilder().appendLine("Name", item.getName())
+                            .appendLine("Type", item.getTypeName()).appendLine("Loaned Out",item.getLoanedOutToString());
 
                     for (ItemAttribute attribute : receiveAttributesTask.getValue()) {
-                        alertBuilder.append(attribute.getAttributeName(), attribute.getAttributeValue());
+                        alertBuilder.appendLine(attribute.getAttributeName(), attribute.getAttributeValue());
                     }
 
                     BusAlert alert = alertBuilder.buildAlert().addButton(new ButtonType("Cancel Reservation", ButtonData.LEFT));
@@ -280,7 +283,7 @@ public class UserIndexController extends BasicController {
             return itemTableRow;
         });
 
-        showDataPane.getChildren().add(itemView);
+        addTableToView();
     }
 
     @FXML
@@ -290,5 +293,10 @@ public class UserIndexController extends BasicController {
         }
 
         LlsApi.getAuthManager().logout();
+    }
+
+    private void addTableToView() {
+        helper.clearAndAdd(itemView);
+        ViewUtil.addConstraints(itemView);
     }
 }

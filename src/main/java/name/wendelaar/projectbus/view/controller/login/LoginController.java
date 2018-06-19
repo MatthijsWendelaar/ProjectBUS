@@ -1,4 +1,4 @@
-package name.wendelaar.projectbus.view.controller;
+package name.wendelaar.projectbus.view.controller.login;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.PasswordField;
@@ -10,6 +10,7 @@ import name.wendelaar.projectbus.main.LlsApi;
 import name.wendelaar.projectbus.validator.InputValidator;
 import name.wendelaar.projectbus.validator.ValidatorException;
 import name.wendelaar.projectbus.view.ViewState;
+import name.wendelaar.projectbus.view.controller.Controller;
 
 public class LoginController extends Controller {
 

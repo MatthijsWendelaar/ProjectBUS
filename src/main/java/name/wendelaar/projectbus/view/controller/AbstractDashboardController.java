@@ -2,7 +2,7 @@ package name.wendelaar.projectbus.view.controller;
 
 import javafx.scene.Node;
 
-public abstract class BasicController extends Controller {
+public abstract class AbstractDashboardController extends Controller {
 
     private Node selectedTab = null;
 

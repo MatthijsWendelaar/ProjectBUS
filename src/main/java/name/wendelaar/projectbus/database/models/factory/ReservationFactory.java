@@ -3,7 +3,7 @@ package name.wendelaar.projectbus.database.models.factory;
 import name.wendelaar.projectbus.database.models.Item;
 import name.wendelaar.projectbus.database.models.Reservation;
 import name.wendelaar.projectbus.database.models.User;
-import name.wendelaar.projectbus.database.util.DataObjectFiller;
+import name.wendelaar.projectbus.database.DataObjectFiller;
 import name.wendelaar.simplevalidator.BoolValidator;
 
 public class ReservationFactory implements IReservationFactory {

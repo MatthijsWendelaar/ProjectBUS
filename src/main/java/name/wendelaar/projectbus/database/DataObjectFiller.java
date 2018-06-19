@@ -1,4 +1,4 @@
-package name.wendelaar.projectbus.database.util;
+package name.wendelaar.projectbus.database;
 
 import name.wendelaar.snowdb.data.DataObject;
 import name.wendelaar.snowdb.data.SingleDataObject;

@@ -1,42 +1,39 @@
 package name.wendelaar.projectbus.view.controller.librarian;
 
+import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
-import javafx.scene.control.Button;
+import javafx.scene.control.*;
 import javafx.scene.control.ButtonBar.ButtonData;
-import javafx.scene.control.ButtonType;
-import javafx.scene.control.TableRow;
-import javafx.scene.control.TableView;
 import javafx.scene.input.MouseButton;
 import javafx.scene.layout.AnchorPane;
 import name.wendelaar.projectbus.database.concurrency.SimpleReceiveTask;
 import name.wendelaar.projectbus.database.manager.IItemManager;
 import name.wendelaar.projectbus.database.manager.IUserManager;
-import name.wendelaar.projectbus.database.models.Item;
-import name.wendelaar.projectbus.database.models.User;
-import name.wendelaar.projectbus.database.models.UserData;
+import name.wendelaar.projectbus.database.models.*;
 import name.wendelaar.projectbus.main.LlsApi;
-import name.wendelaar.projectbus.util.ShowDataAlertBuilder;
-import name.wendelaar.projectbus.view.controller.BasicController;
+import name.wendelaar.projectbus.view.util.InfoAlertBuilder;
+import name.wendelaar.projectbus.view.controller.AbstractDashboardController;
 import name.wendelaar.projectbus.view.form.Form;
 import name.wendelaar.projectbus.view.form.FormBuilder;
 import name.wendelaar.projectbus.view.form.fields.FormComboBox;
 import name.wendelaar.projectbus.view.form.validator.AllFilledValidator;
 import name.wendelaar.projectbus.view.parts.BusAlert;
 import name.wendelaar.projectbus.view.parts.TableBuilder;
+import name.wendelaar.projectbus.view.util.PaneHelper;
+import name.wendelaar.projectbus.view.util.ViewUtil;
 import name.wendelaar.snowdb.data.DataObject;
 import name.wendelaar.snowdb.data.SingleDataObject;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.ExecutorService;
 
-public class LiberianIndexController extends BasicController {
+public class LiberianIndexController extends AbstractDashboardController {
 
     private String title = "Dashboard";
+    private PaneHelper paneHelper;
 
     @FXML
     private AnchorPane showDataPane;
@@ -48,6 +45,8 @@ public class LiberianIndexController extends BasicController {
     private Button createUserButton;
     @FXML
     private Button showItemsButton;
+    @FXML
+    private Button createItemButton;
 
     private TableView tableView;
 
@@ -64,7 +63,7 @@ public class LiberianIndexController extends BasicController {
 
     @Override
     public void setupAfterInitialization() {
-        System.out.println("watt");
+        paneHelper = new PaneHelper(showDataPane);
         //addConstraints(showDataPane);
     }
 
@@ -111,18 +110,18 @@ public class LiberianIndexController extends BasicController {
                 receiveUserDataPersonalTask.setOnSucceeded(t -> {
                     UserData userData = receiveUserDataPersonalTask.getValue();
 
-                    BusAlert alert = new ShowDataAlertBuilder().append("UUID", user.getId()).append("Username", user.getUserName())
-                            .append("First Name", userData.getFirstName()).append("Last Name", userData.getLastName()).append("Email", user.getEmail())
-                            .append("Librarian", user.isLibrarianToString()).append("Account Disabled", user.isAccountDisabledToString())
-                            .append("City", userData.getCity()).append("Postal Code", userData.getPostalCode())
-                            .append("Address", userData.getStreet() + " " + userData.getHomeNumber()).buildAlert();
+                    BusAlert alert = new InfoAlertBuilder().appendLine("UUID", user.getId()).appendLine("Username", user.getUserName())
+                            .appendLine("First Name", userData.getFirstName()).appendLine("Last Name", userData.getLastName()).appendLine("Email", user.getEmail())
+                            .appendLine("Librarian", user.isLibrarianToString()).appendLine("Account Disabled", user.isAccountDisabledToString())
+                            .appendLine("City", userData.getCity()).appendLine("Postal Code", userData.getPostalCode())
+                            .appendLine("Address", userData.getStreet() + " " + userData.getHomeNumber()).buildAlert();
 
                     if (!user.isLibrarian()) {
                         alert.addButton(new ButtonType("Delete User", ButtonData.LEFT));
                         if (user.isAccountDisabled()) {
-                            alert.addButton(new ButtonType("Enable Account", ButtonData.LEFT));
+                            alert.addButton(new ButtonType("Enable", ButtonData.LEFT));
                         } else {
-                            alert.addButton(new ButtonType("Disable Account", ButtonData.LEFT));
+                            alert.addButton(new ButtonType("Disable", ButtonData.LEFT));
                         }
                     }
 
@@ -138,8 +137,8 @@ public class LiberianIndexController extends BasicController {
                             });
                             tableView.getItems().remove(user);
                             break;
-                        case "Enable Account":
-                        case "Disable Account":
+                        case "Enable":
+                        case "Disable":
                             service.submit(() -> {
                                 LlsApi.getUserManager().disableUser(user);
                             });
@@ -155,8 +154,8 @@ public class LiberianIndexController extends BasicController {
 
         service.submit(receiveUsersTask);
 
-        addAndClear(tableView);
-        addConstraints(tableView);
+        paneHelper.clearAndAdd(tableView);
+        ViewUtil.addConstraints(tableView);
     }
 
     @FXML
@@ -207,16 +206,21 @@ public class LiberianIndexController extends BasicController {
             };
 
             saveUserTask.setOnSucceeded(wk -> {
-                new BusAlert().addDefaultIcon().addDefaultStyleSheet().setMessage("The user was successfully added!").showAndWait();
                 form.clearForm();
+                new BusAlert().addDefaultIcon().addDefaultStyleSheet().setMessage("The user was successfully added!").showAndWait();
+            });
+
+            saveUserTask.setOnFailed(wk -> {
+                form.clearForm();
+                new BusAlert().addDefaultIcon().addDefaultStyleSheet().setMessage("Something went wrong while adding the user, please try again").showAndWait();
             });
 
             service.submit(saveUserTask);
         });
 
 
-        addAndClear(form.getRoot());
-        addConstraints(form.getRoot());
+        paneHelper.clearAndAdd(form.getRoot());
+        ViewUtil.addConstraints(form.getRoot());
     }
 
     @FXML
@@ -246,8 +250,51 @@ public class LiberianIndexController extends BasicController {
                 .addColumn("Loaned Out At", "LoanedOutDate")
                 .getTableView();
 
-        addAndClear(tableView);
-        addConstraints(tableView);
+        paneHelper.clearAndAdd(tableView);
+        ViewUtil.addConstraints(tableView);
+    }
+
+    @FXML
+    private void onCreateItem() {
+        if (isSelected(createItemButton)) {
+            return;
+        }
+
+        ExecutorService service = LlsApi.getController().getExecutorService();
+
+        SimpleReceiveTask<Collection<ItemType>> itemTypeReceiveTask = new SimpleReceiveTask<Collection<ItemType>>() {
+            @Override
+            public Collection<ItemType> execute() {
+                return LlsApi.getItemManager().getItemTypes();
+            }
+        };
+
+        itemTypeReceiveTask.setOnSucceeded(wk -> {
+            HashMap<String, Integer> comboBoxMap = new LinkedHashMap<>();
+
+            Collection<ItemType> itemTypes = itemTypeReceiveTask.getValue();
+
+            for (ItemType itemType : itemTypes) {
+                comboBoxMap.put(itemType.getName(), itemType.getId());
+            }
+
+            ComboBox<String> comboBox = new ComboBox<>(FXCollections.observableArrayList(comboBoxMap.keySet()));
+
+            comboBox.setOnAction(event -> {
+                String selected = comboBox.getSelectionModel().getSelectedItem();
+                int id = comboBoxMap.get(selected);
+
+                setItemForm(id);
+                //new InfoAlertBuilder().appendLine(selected, id).buildAlert().showAndWait();
+            });
+
+            paneHelper.clearAndAdd(comboBox);
+
+            comboBox.getSelectionModel().selectFirst();
+            comboBox.fireEvent(new ActionEvent());
+        });
+
+        service.submit(itemTypeReceiveTask);
     }
 
     @FXML
@@ -259,20 +306,32 @@ public class LiberianIndexController extends BasicController {
         LlsApi.getAuthManager().logout();
     }
 
-    private void addAndClear(Node node) {
-        ObservableList<Node> items = showDataPane.getChildren();
-        items.clear();
-        items.add(node);
-    }
+    private void setItemForm(int itemType) {
+        ExecutorService service = LlsApi.getController().getExecutorService();
 
-    private void addConstraints(Node node) {
-        if (node == null) {
-            return;
-        }
+        SimpleReceiveTask<Collection<ItemTypeAttribute>> itemAttributesReceiveTask = new SimpleReceiveTask<Collection<ItemTypeAttribute>>() {
+            @Override
+            public Collection<ItemTypeAttribute> execute() {
+                return LlsApi.getItemAttributeManager().getAttributesOfType(itemType);
+            }
+        };
 
-        AnchorPane.setBottomAnchor(node, 0.0);
-        AnchorPane.setLeftAnchor(node, 0.0);
-        AnchorPane.setRightAnchor(node, 0.0);
-        AnchorPane.setTopAnchor(node, 0.0);
+        itemAttributesReceiveTask.setOnSucceeded(wk -> {
+            Collection<ItemTypeAttribute> attributes = itemAttributesReceiveTask.getValue();
+
+            FormBuilder builder = new FormBuilder().addTextField("Item Name", "item.item_name").addValidator(new AllFilledValidator());
+
+            for (ItemTypeAttribute attribute : attributes) {
+                builder.addTextField(attribute.getAttributeName(), String.valueOf(attribute.getId()));
+            }
+
+            Form form = builder.build();
+            form.setReceiver(new CreateItemReceiver(itemType, form));
+
+            paneHelper.addItem(form.getRoot());
+            ViewUtil.addConstraints(form.getRoot(), 30,0,0,0);
+        });
+
+        service.submit(itemAttributesReceiveTask);
     }
 }
