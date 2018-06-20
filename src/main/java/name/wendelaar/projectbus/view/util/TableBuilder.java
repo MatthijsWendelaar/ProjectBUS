@@ -1,4 +1,4 @@
-package name.wendelaar.projectbus.view.parts;
+package name.wendelaar.projectbus.view.util;
 
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;

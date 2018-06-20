@@ -37,7 +37,12 @@
                   <Font name="Open Sans SemiBold" size="12.0" />
                </font>
             </Button>
-            <Button fx:id="createItemButton" layoutY="151.0" mnemonicParsing="false" onAction="#onCreateItem" prefHeight="25.0" prefWidth="137.0" styleClass="primary-button" text="New Item" textAlignment="CENTER" textFill="WHITE">
+            <Button fx:id="createItemButton" layoutY="152.0" mnemonicParsing="false" onAction="#onCreateItem" prefHeight="25.0" prefWidth="137.0" styleClass="primary-button" text="New Item" textAlignment="CENTER" textFill="WHITE">
+               <font>
+                  <Font name="Open Sans SemiBold" size="12.0" />
+               </font>
+            </Button>
+            <Button fx:id="showReservationButton" layoutY="184.0" mnemonicParsing="false" onAction="#onShowReservations" prefHeight="25.0" prefWidth="137.0" styleClass="primary-button" text="Reservations" textAlignment="CENTER" textFill="WHITE">
                <font>
                   <Font name="Open Sans SemiBold" size="12.0" />
                </font>

@@ -34,6 +34,10 @@ public class Item extends Model {
         }
     }
 
+    public Item(DataObject dataObject) {
+        super(dataObject, "item");
+    }
+
     public int getId() {
         return (int) dataObject.get("id");
     }

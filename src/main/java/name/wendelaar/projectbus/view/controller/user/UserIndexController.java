@@ -17,7 +17,7 @@ import name.wendelaar.projectbus.main.LlsApi;
 import name.wendelaar.projectbus.view.util.InfoAlertBuilder;
 import name.wendelaar.projectbus.view.controller.AbstractDashboardController;
 import name.wendelaar.projectbus.view.parts.BusAlert;
-import name.wendelaar.projectbus.view.parts.TableBuilder;
+import name.wendelaar.projectbus.view.util.TableBuilder;
 import name.wendelaar.projectbus.view.util.PaneHelper;
 import name.wendelaar.projectbus.view.util.ViewUtil;
 

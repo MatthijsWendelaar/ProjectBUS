@@ -12,19 +12,19 @@ import name.wendelaar.projectbus.database.manager.IItemManager;
 import name.wendelaar.projectbus.database.manager.IUserManager;
 import name.wendelaar.projectbus.database.models.*;
 import name.wendelaar.projectbus.main.LlsApi;
-import name.wendelaar.projectbus.view.util.InfoAlertBuilder;
+import name.wendelaar.projectbus.view.util.*;
 import name.wendelaar.projectbus.view.controller.AbstractDashboardController;
 import name.wendelaar.projectbus.view.form.Form;
 import name.wendelaar.projectbus.view.form.FormBuilder;
 import name.wendelaar.projectbus.view.form.fields.FormComboBox;
 import name.wendelaar.projectbus.view.form.validator.AllFilledValidator;
 import name.wendelaar.projectbus.view.parts.BusAlert;
-import name.wendelaar.projectbus.view.parts.TableBuilder;
-import name.wendelaar.projectbus.view.util.PaneHelper;
-import name.wendelaar.projectbus.view.util.ViewUtil;
 import name.wendelaar.snowdb.data.DataObject;
+import name.wendelaar.snowdb.data.DataObjectCollection;
 import name.wendelaar.snowdb.data.SingleDataObject;
+import name.wendelaar.snowdb.manager.Manager;
 
+import java.sql.SQLException;
 import java.util.*;
 import java.util.concurrent.ExecutorService;
 
@@ -45,6 +45,8 @@ public class LiberianIndexController extends AbstractDashboardController {
     private Button showItemsButton;
     @FXML
     private Button createItemButton;
+    @FXML
+    private Button showReservationButton;
 
     private TableView tableView;
 
@@ -241,8 +243,6 @@ public class LiberianIndexController extends AbstractDashboardController {
             tableView.getItems().addAll(receiveItemsTask.getValue());
         });
 
-        service.submit(receiveItemsTask);
-
         tableView = new TableBuilder<Item, String>().addColumn("Name", "Name")
                 .addColumn("Type", "TypeName").addColumn("Loaned Out", "LoanedOutToString")
                 .addColumn("Loaned Out At", "LoanedOutDate")
@@ -292,6 +292,9 @@ public class LiberianIndexController extends AbstractDashboardController {
             return tableRow;
         });
 
+        service.submit(receiveItemsTask);
+
+
         paneHelper.clearAndAdd(tableView);
         ViewUtil.addConstraints(tableView);
     }
@@ -337,6 +340,83 @@ public class LiberianIndexController extends AbstractDashboardController {
         });
 
         service.submit(itemTypeReceiveTask);
+    }
+
+    @FXML
+    private void onShowReservations() {
+        if (isSelected(showReservationButton)) {
+            return;
+        }
+
+        ExecutorService service = LlsApi.getController().getExecutorService();
+
+        SimpleReceiveTask<Collection<DataObject>> receiveReservationsTask = new SimpleReceiveTask<Collection<DataObject>>() {
+            @Override
+            public Collection<DataObject> execute() {
+                List<DataObject> dataObjects = null;
+                try {
+                    dataObjects = Manager.create().prepare("SELECT * FROM reservation INNER JOIN user ON reservation.user_id = user.id INNER JOIN item ON item.id = reservation.item_id").find();
+                } catch (SQLException ex) {
+                    ex.printStackTrace();
+                }
+                return dataObjects;
+            }
+        };
+
+        receiveReservationsTask.setOnSucceeded(wk -> {
+            tableView.getItems().addAll(receiveReservationsTask.getValue());
+        });
+
+        tableView = new DataObjectTableBuilder().addColumn("Item Name", "item.item_name").addColumn("Loaned out", "item.loaned_out")
+                .addColumn("Reservation Created", "reservation.created_at").addColumn("Name of User", "user.username")
+                .addColumn("Email of User", "user.email").buildTable();
+
+        tableView.setRowFactory(tv -> {
+            TableRow<DataObject> tableRow = new TableRow<>();
+
+            tableRow.setOnMouseClicked(event -> {
+
+                    if (event.getClickCount() != 2 || !MouseButton.PRIMARY.equals(event.getButton()) || tableRow.isEmpty()) {
+                        return;
+                    }
+
+                    DataObjectCollection dataObject = (DataObjectCollection) tableRow.getItem();
+
+                    BusAlert alert = new InfoAlertBuilder().appendLine("Username",  dataObject.get("user.username"))
+                            .appendLine("Item Name", dataObject.get("item.item_name")).appendLine("Reservation Created", dataObject.get("reservation.created_at"))
+                            .buildAlert();
+
+                    if (!(boolean) dataObject.get("item.loaned_out")) {
+                        alert.addButton(new ButtonType("Accept", ButtonData.LEFT));
+                    }
+                    alert.addButton(new ButtonType("Cancel", ButtonData.LEFT));
+
+                    Optional<ButtonType> buttonType = alert.showAndWait();
+                    ButtonType type;
+
+                    if (buttonType.isPresent() && (type =  buttonType.get()).getButtonData().equals(ButtonData.LEFT)) {
+
+                        User user = new User(dataObject.getDataObjectByTable("user"));
+                        Item item = new Item(dataObject.getDataObjectByTable("item"));
+
+                        service.submit(() -> {
+                            if (type.getText().equals("Accept")) {
+                                LlsApi.getItemManager().loanOutItem(user, item);
+                            }
+                            LlsApi.getReservationManager().removeReservation(user, item);
+                        });
+
+                        tableView.getItems().remove(dataObject);
+                    }
+            });
+
+            return tableRow;
+        });
+
+        service.submit(receiveReservationsTask);
+
+        paneHelper.clearAndAdd(tableView);
+        ViewUtil.addConstraints(tableView);
     }
 
     @FXML

@@ -7,6 +7,7 @@ import name.wendelaar.projectbus.database.models.factory.IReservationFactory;
 import name.wendelaar.projectbus.database.models.factory.ReservationFactory;
 import name.wendelaar.projectbus.main.MainManager;
 import name.wendelaar.simplevalidator.BoolValidator;
+import name.wendelaar.snowdb.data.DataObject;
 import name.wendelaar.snowdb.manager.Manager;
 
 import java.sql.SQLException;
@@ -24,9 +25,9 @@ public class ReservationManager implements IReservationManager {
 
     @Override
     public void addReservation(User user, Item item) {
-        Reservation reservation = reservationFactory.makeReservation(item, user);
+        DataObject reservation = reservationFactory.makeReservation(item, user);
         if (reservation != null) {
-            Manager.saveModel(reservation);
+            Manager.saveDataObject(reservation);
         }
     }
 
