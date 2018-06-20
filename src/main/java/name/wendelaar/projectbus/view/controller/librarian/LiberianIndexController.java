@@ -1,10 +1,8 @@
 package name.wendelaar.projectbus.view.controller.librarian;
 
 import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.control.ButtonBar.ButtonData;
 import javafx.scene.input.MouseButton;
@@ -64,7 +62,7 @@ public class LiberianIndexController extends AbstractDashboardController {
     @Override
     public void setupAfterInitialization() {
         paneHelper = new PaneHelper(showDataPane);
-        //addConstraints(showDataPane);
+        onShowUsers();
     }
 
     @FXML
@@ -249,6 +247,50 @@ public class LiberianIndexController extends AbstractDashboardController {
                 .addColumn("Type", "TypeName").addColumn("Loaned Out", "LoanedOutToString")
                 .addColumn("Loaned Out At", "LoanedOutDate")
                 .getTableView();
+
+        tableView.setRowFactory(table -> {
+            TableRow<Item> tableRow = new TableRow<>();
+
+            tableRow.setOnMouseClicked(event -> {
+                if (event.getClickCount() != 2 || !MouseButton.PRIMARY.equals(event.getButton()) || tableRow.isEmpty()) {
+                    return;
+                }
+
+                Item item = tableRow.getItem();
+
+                SimpleReceiveTask<Collection<ItemAttribute>> receiveAttributesTask = new SimpleReceiveTask<Collection<ItemAttribute>>() {
+
+                    @Override
+                    public Collection<ItemAttribute> execute() {
+                        return LlsApi.getItemAttributeManager().getAttributesOfItem(item);
+                    }
+                };
+
+                receiveAttributesTask.setOnSucceeded(t -> {
+                    InfoAlertBuilder alertBuilder = new InfoAlertBuilder().appendLine("Id",  item.getId())
+                            .appendLine("Name", item.getName()).appendLine("Too Late", item.getToLateToString())
+                            .appendLine("Type", item.getTypeName()).appendLine("Date Loaned", item.getLoanedOutDate());
+
+                    for (ItemAttribute attribute : receiveAttributesTask.getValue()) {
+                        alertBuilder.appendLine(attribute.getAttributeName(), attribute.getAttributeValue());
+                    }
+
+                    BusAlert alert = alertBuilder.buildAlert().addButton(new ButtonType("Remove Item", ButtonData.LEFT));
+
+                    Optional<ButtonType> buttonType = alert.showAndWait();
+                    if (buttonType.isPresent() && buttonType.get().getButtonData().equals(ButtonData.LEFT)) {
+                        service.submit(() -> {
+                            itemManager.removeItem(item);
+                        });
+                        tableView.getItems().remove(item);
+                    }
+                });
+
+                service.submit(receiveAttributesTask);
+            });
+
+            return tableRow;
+        });
 
         paneHelper.clearAndAdd(tableView);
         ViewUtil.addConstraints(tableView);

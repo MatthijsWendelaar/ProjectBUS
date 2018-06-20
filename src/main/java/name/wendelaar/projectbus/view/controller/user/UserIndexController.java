@@ -80,7 +80,7 @@ public class UserIndexController extends AbstractDashboardController {
 
         service.submit(receiveItemsTask);
 
-        itemView.setRowFactory(tv -> {
+        itemView.setRowFactory(rf -> {
             TableRow<Item> row = new TableRow<>();
             row.setOnMouseClicked(event -> {
                 if (event.getClickCount() == 2 && event.getButton().equals(MouseButton.PRIMARY) && !row.isEmpty()) {

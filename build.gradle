@@ -31,7 +31,7 @@ dependencies {
 jar {
     manifest {
         attributes(
-            'Main-Class': 'name.wendelaar.Main'
+            'Main-Class': 'name.wendelaar.projectbus.main.Main'
         )
     }
 }

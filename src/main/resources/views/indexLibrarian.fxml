@@ -9,7 +9,7 @@
 
 <AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" stylesheets="@styles.css" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="name.wendelaar.projectbus.view.controller.librarian.LiberianIndexController">
     <children>
-        <Pane prefHeight="400.0" prefWidth="137.0" styleClass="root" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="463.0" AnchorPane.topAnchor="0.0">
+        <Pane prefHeight="400.0" prefWidth="137.0" styleClass="primary-bg-dark" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="463.0" AnchorPane.topAnchor="0.0">
             <children>
                 <Text fill="WHITE" layoutX="39.0" layoutY="38.0" strokeType="OUTSIDE" strokeWidth="0.0" text="LLS" textAlignment="CENTER">
                     <font>
@@ -44,6 +44,6 @@
             </Button>
             </children>
         </Pane>
-        <AnchorPane fx:id="showDataPane" layoutX="140.0" prefHeight="400.0" prefWidth="460.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="140.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+        <AnchorPane fx:id="showDataPane" layoutX="140.0" prefHeight="400.0" prefWidth="460.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="137.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
     </children>
 </AnchorPane>

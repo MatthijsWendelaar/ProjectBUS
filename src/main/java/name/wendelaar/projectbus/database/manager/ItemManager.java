@@ -36,7 +36,7 @@ public class ItemManager implements IItemManager {
 
     @Override
     public void removeItem(Item item) {
-
+        Manager.deleteModel(item);
     }
 
     @Override
@@ -55,7 +55,6 @@ public class ItemManager implements IItemManager {
         }
 
         item.loanOutItem(borrower);
-        item.printInfo();
         Manager.saveModel(item);
     }
 

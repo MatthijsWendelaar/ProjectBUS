@@ -108,13 +108,6 @@ public class Item extends Model {
         dataObject.set("loaned_out", 1);
     }
 
-    public void printInfo() {
-        for (String s : dataObject.getModifiedColumns()) {
-            System.out.println("MODI: " + s);
-            System.out.println("Value: " + dataObject.get(s));
-        }
-    }
-
     protected Object getAttributeValue(String name) {
         ExcepValidator.notNull("Attributes not set", attributeMap);
         ItemAttribute attribute = attributeMap.get(name);

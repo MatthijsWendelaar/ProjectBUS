@@ -25,9 +25,7 @@ public class ReservationManager implements IReservationManager {
     @Override
     public void addReservation(User user, Item item) {
         Reservation reservation = reservationFactory.makeReservation(item, user);
-        System.out.println("DERP");
         if (reservation != null) {
-            System.out.println("Lekkar");
             Manager.saveModel(reservation);
         }
     }

@@ -21,7 +21,7 @@ public class DataObjectFiller {
         if (dataMap.containsKey(fullName)) {
             dataMap.replace(fullName, value);
         } else {
-            dataMap.put(fullName, value);
+            dataMap.put(key, value);
         }
         return this;
     }

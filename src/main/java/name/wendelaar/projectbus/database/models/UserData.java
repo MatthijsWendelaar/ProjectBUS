@@ -47,10 +47,4 @@ public class UserData extends Model {
             throw new IllegalArgumentException("User does not match with UserData");
         }
     }
-
-    public void printAll() {
-        for (Object o : dataObject.getAll()) {
-            System.out.println(o);
-        }
-    }
 }
