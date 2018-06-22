@@ -6,6 +6,7 @@ import name.wendelaar.projectbus.view.IViewManager;
 import name.wendelaar.projectbus.view.ViewManager;
 import name.wendelaar.projectbus.view.ViewState;
 import name.wendelaar.snowdb.SnowDB;
+import name.wendelaar.snowdb.data.factory.PerformanceDataObjectFactory;
 import name.wendelaar.snowdb.exceptions.SnowDBException;
 
 import java.util.concurrent.ExecutorService;

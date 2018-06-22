@@ -1,7 +1,6 @@
 package name.wendelaar.projectbus.database.manager;
 
 import name.wendelaar.projectbus.database.models.Item;
-import name.wendelaar.projectbus.database.models.Reservation;
 import name.wendelaar.projectbus.database.models.User;
 import name.wendelaar.projectbus.database.models.factory.IReservationFactory;
 import name.wendelaar.projectbus.database.models.factory.ReservationFactory;
@@ -11,7 +10,6 @@ import name.wendelaar.snowdb.data.DataObject;
 import name.wendelaar.snowdb.manager.Manager;
 
 import java.sql.SQLException;
-import java.util.Collection;
 
 public class ReservationManager implements IReservationManager {
 
@@ -52,20 +50,5 @@ public class ReservationManager implements IReservationManager {
                 manager.saveClose();
             }
         }
-    }
-
-    @Override
-    public Collection<Reservation> getReservationsOfItem(Item item) {
-        return null;
-    }
-
-    @Override
-    public Collection<Reservation> getReservationsOfUser(User user) {
-        return null;
-    }
-
-    @Override
-    public Collection<Reservation> getReservations() {
-        return null;
     }
 }
