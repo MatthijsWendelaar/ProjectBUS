@@ -451,7 +451,7 @@ public class LiberianIndexController extends AbstractDashboardController {
             form.setReceiver(new CreateItemReceiver(itemType, form));
 
             paneHelper.addItem(form.getRoot());
-            ViewUtil.addConstraints(form.getRoot(), 30,0,0,0);
+            ViewUtil.addConstraints(form.getRoot(), 30,0,0, 0);
         });
 
         service.submit(itemAttributesReceiveTask);
